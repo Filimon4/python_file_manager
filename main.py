@@ -4,6 +4,7 @@ from rockWidget import RockWidget
 from messageBox import MessageBox
 from lineEditor import LineEditor
 from textEdit import TextEdit
+from imageBox import ImageBox
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -13,8 +14,10 @@ if __name__ == "__main__":
     # m.show()
     # l = LineEditor()
     # l.show()
-    t = TextEdit()
-    t.show()
+    # t = TextEdit()
+    # t.show()
+    i = ImageBox()
+    i.show()
     app.exec()
 
 # import os
