@@ -10,6 +10,7 @@ from gridLayout import GridLayout
 from buttonLayout import ButtonLayout
 from listWidget import ListWidget
 from tabWidget import TabWidget
+from comboBox import ComboBox
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -31,8 +32,10 @@ if __name__ == "__main__":
     # b.show()
     # lw = ListWidget()
     # lw.show()
-    tw = TabWidget()
-    tw.show()
+    # tw = TabWidget()
+    # tw.show()
+    cb = ComboBox()
+    cb.show()
     app.exec()
 
 # import os
