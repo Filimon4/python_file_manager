@@ -7,6 +7,8 @@ from textEdit import TextEdit
 from imageBox import ImageBox
 from sizePolicies import SizePolicies
 from gridLayout import GridLayout
+from buttonLayout import ButtonLayout
+from listWidget import ListWidget
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -22,8 +24,12 @@ if __name__ == "__main__":
     # i.show()
     # s = SizePolicies()
     # s.show()
-    g = GridLayout()
-    g.show()
+    # g = GridLayout()
+    # g.show()
+    # b = ButtonLayout()
+    # b.show()
+    lw = ListWidget()
+    lw.show()
     app.exec()
 
 # import os
