@@ -1,21 +1,23 @@
 import sys
 from PySide6.QtWidgets import QApplication
-from rockWidget import RockWidget
-from messageBox import MessageBox
-from lineEditor import LineEditor
-from textEdit import TextEdit
-from imageBox import ImageBox
-from sizePolicies import SizePolicies
-from gridLayout import GridLayout
-from buttonLayout import ButtonLayout
-from listWidget import ListWidget
-from tabWidget import TabWidget
-from comboBox import ComboBox
-from loadUI import LoadUI
-from spinerWidget import SpinerWidget
+# from rockWidget import RockWidget
+# from messageBox import MessageBox
+# from lineEditor import LineEditor
+# from textEdit import TextEdit
+# from imageBox import ImageBox
+# from sizePolicies import SizePolicies
+# from gridLayout import GridLayout
+# from buttonLayout import ButtonLayout
+# from listWidget import ListWidget
+# from tabWidget import TabWidget
+# from comboBox import ComboBox
+# from loadUI import LoadUI
+# from spinerWidget import SpinerWidget
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
+from startWindow import StartWindow
+
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
     # w = RockWidget(app)
     # w.show()
     # m = MessageBox()
@@ -40,9 +42,9 @@ if __name__ == "__main__":
     # cb.show()
     # qi = LoadUI()
     # qi.show()
-    sw = SpinerWidget()
-    sw.show()
-    app.exec()
+    # sw = SpinerWidget()
+    # sw.show()
+    # app.exec()
 
 # import os
 # from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QTreeView, QListView, QVBoxLayout, QLabel, \
@@ -220,4 +222,8 @@ if __name__ == "__main__":
 #     app.exec()
 
 
-
+if __name__ == "__main__":
+    app = QApplication([])
+    window = StartWindow(app)
+    window.show()
+    app.exec()
