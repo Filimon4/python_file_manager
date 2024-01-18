@@ -5,6 +5,7 @@ from messageBox import MessageBox
 from lineEditor import LineEditor
 from textEdit import TextEdit
 from imageBox import ImageBox
+from sizePolicies import SizePolicies
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -16,8 +17,10 @@ if __name__ == "__main__":
     # l.show()
     # t = TextEdit()
     # t.show()
-    i = ImageBox()
-    i.show()
+    # i = ImageBox()
+    # i.show()
+    s = SizePolicies()
+    s.show()
     app.exec()
 
 # import os
