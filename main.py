@@ -6,6 +6,7 @@ from lineEditor import LineEditor
 from textEdit import TextEdit
 from imageBox import ImageBox
 from sizePolicies import SizePolicies
+from gridLayout import GridLayout
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -19,8 +20,10 @@ if __name__ == "__main__":
     # t.show()
     # i = ImageBox()
     # i.show()
-    s = SizePolicies()
-    s.show()
+    # s = SizePolicies()
+    # s.show()
+    g = GridLayout()
+    g.show()
     app.exec()
 
 # import os
