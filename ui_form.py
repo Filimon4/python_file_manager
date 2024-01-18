@@ -15,24 +15,66 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGroupBox, QSizePolicy, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        if not Form.objectName():
-            Form.setObjectName(u"Form")
-        Form.resize(844, 583)
-        self.groupBox = QGroupBox(Form)
-        self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setGeometry(QRect(0, 0, 841, 71))
+class Ui_Widget(object):
+    def setupUi(self, Widget):
+        if not Widget.objectName():
+            Widget.setObjectName(u"Widget")
+        Widget.resize(535, 141)
+        self.verticalLayout_2 = QVBoxLayout(Widget)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.fullNameLabel = QLabel(Widget)
+        self.fullNameLabel.setObjectName(u"fullNameLabel")
 
-        self.retranslateUi(Form)
+        self.horizontalLayout.addWidget(self.fullNameLabel)
 
-        QMetaObject.connectSlotsByName(Form)
+        self.fullNameLineEdit = QLineEdit(Widget)
+        self.fullNameLineEdit.setObjectName(u"fullNameLineEdit")
+
+        self.horizontalLayout.addWidget(self.fullNameLineEdit)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.OccupationLabel = QLabel(Widget)
+        self.OccupationLabel.setObjectName(u"OccupationLabel")
+
+        self.horizontalLayout_2.addWidget(self.OccupationLabel)
+
+        self.OccupationLineEdit = QLineEdit(Widget)
+        self.OccupationLineEdit.setObjectName(u"OccupationLineEdit")
+
+        self.horizontalLayout_2.addWidget(self.OccupationLineEdit)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+
+        self.pushButton = QPushButton(Widget)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.verticalLayout.addWidget(self.pushButton)
+
+
+        self.verticalLayout_2.addLayout(self.verticalLayout)
+
+
+        self.retranslateUi(Widget)
+
+        QMetaObject.connectSlotsByName(Widget)
     # setupUi
 
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.groupBox.setTitle(QCoreApplication.translate("Form", u"GroupBox", None))
+    def retranslateUi(self, Widget):
+        Widget.setWindowTitle(QCoreApplication.translate("Widget", u"Form", None))
+        self.fullNameLabel.setText(QCoreApplication.translate("Widget", u"FullName", None))
+        self.OccupationLabel.setText(QCoreApplication.translate("Widget", u"Occupation", None))
+        self.pushButton.setText(QCoreApplication.translate("Widget", u"PushButton", None))
     # retranslateUi
 

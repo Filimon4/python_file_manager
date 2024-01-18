@@ -11,6 +11,8 @@ from buttonLayout import ButtonLayout
 from listWidget import ListWidget
 from tabWidget import TabWidget
 from comboBox import ComboBox
+from loadUI import LoadUI
+from spinerWidget import SpinerWidget
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -34,8 +36,12 @@ if __name__ == "__main__":
     # lw.show()
     # tw = TabWidget()
     # tw.show()
-    cb = ComboBox()
-    cb.show()
+    # cb = ComboBox()
+    # cb.show()
+    # qi = LoadUI()
+    # qi.show()
+    sw = SpinerWidget()
+    sw.show()
     app.exec()
 
 # import os
