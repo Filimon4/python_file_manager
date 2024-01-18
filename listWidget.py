@@ -39,7 +39,7 @@ class ListWidget(QWidget):
         # v_layout_2.addWidget(button_item_count)
         # v_layout_2.addWidget(button_selected_items)
 
-        self.setLayout(self.list_widget)
+        self.setLayout(v_layout)
 
     def current_item_changed(self, item):
         print("Current item : ", item.text())

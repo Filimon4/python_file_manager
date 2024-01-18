@@ -9,6 +9,7 @@ from sizePolicies import SizePolicies
 from gridLayout import GridLayout
 from buttonLayout import ButtonLayout
 from listWidget import ListWidget
+from tabWidget import TabWidget
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -28,8 +29,10 @@ if __name__ == "__main__":
     # g.show()
     # b = ButtonLayout()
     # b.show()
-    lw = ListWidget()
-    lw.show()
+    # lw = ListWidget()
+    # lw.show()
+    tw = TabWidget()
+    tw.show()
     app.exec()
 
 # import os
