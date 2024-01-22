@@ -39,6 +39,10 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="actionCut"/>
+    <addaction name="actionRename"/>
+    <addaction name="actionMake_folder"/>
+    <addaction name="actionNew_File"/>
+    <addaction name="actionDelete_folder"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -80,6 +84,26 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="text">
+    <string>Rename</string>
+   </property>
+  </action>
+  <action name="actionMake_folder">
+   <property name="text">
+    <string>New Folder</string>
+   </property>
+  </action>
+  <action name="actionDelete_folder">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionNew_File">
+   <property name="text">
+    <string>New File</string>
    </property>
   </action>
  </widget>
