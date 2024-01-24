@@ -1,8 +1,10 @@
 {
     "files": [
+        "Counter.py",
+        "form.ui",
+        "icons.qrc",
         "main.py",
         "mainwindow.ui",
-        "resource.qrc",
         "startWindow.py"
     ]
 }

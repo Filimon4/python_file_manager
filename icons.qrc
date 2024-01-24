@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>C:/Users/Efim/Downloads/back_up.png</file>
+        <file>C:/Users/Efim/Downloads/back_next.png</file>
+        <file>C:/Users/Efim/Downloads/back_prev.png</file>
+        <file>imgs_file_manager/add-document.png</file>
+        <file>imgs_file_manager/add-folder.png</file>
+        <file>imgs_file_manager/circle-xmark.png</file>
+        <file>imgs_file_manager/copy-alt.png</file>
+        <file>imgs_file_manager/info.png</file>
+        <file>imgs_file_manager/level-up.png</file>
+        <file>imgs_file_manager/move-to-folder.png</file>
+        <file>imgs_file_manager/paste.png</file>
+        <file>imgs_file_manager/pen-square.png</file>
+        <file>imgs_file_manager/redo-alt.png</file>
+        <file>imgs_file_manager/scissors.png</file>
+        <file>imgs_file_manager/trash.png</file>
+        <file>imgs_file_manager/undo-alt.png</file>
+    </qresource>
+</RCC>
