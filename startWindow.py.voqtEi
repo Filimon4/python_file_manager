@@ -1,0 +1,84 @@
+from PySide6.QtWidgets import QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtCore import QDir, QSize
+from PySide6.QtGui import QIcon
+from ui_mainwindow import Ui_MainWindow
+
+class StartWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.last_move = []
+        self.next_move = []
+
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setWindowTitle("File title")
+        self.setGeometry(100, 100, 800, 600)
+
+        self.filePath = self.ui.directory
+        self.filePath.setText(f"Current: {QDir.root().dirName()}")
+
+        self.dialog = QFileSystemModel(self)
+        self.dialog.setRootPath(QDir.currentPath())
+        self.dialog.rootPathChanged.connect(self.pathChanged)
+
+        self.tree = QTreeView(self.ui.treeView)
+        self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
+        self.tree.setModel(self.dialog)
+        self.tree.doubleClicked.connect(self.treeClicked)
+        self.tree.setRootIndex(self.dialog.index(QDir.root().dirName()))
+
+        redo_btn = self.ui.redo_btn
+        undo_btn = self.ui.undo_btn
+
+        redo_btn.clicked.connect(self.redo)
+        undo_btn.clicked.connect(self.undo)
+
+
+    def pathChanged(self, path):
+        print(path)
+
+    def btn_clicked(self):
+        print("clicked")
+
+    def treeClicked(self, index):
+        file = self.dialog.filePath(index)
+        self.filePath.setText(f"Current: {file}")
+        print(self.tree.rootIndex())
+        self.last_move.insert(0, self.tree.rootIndex())
+        self.render_new_root(file)
+
+    def undo (self):
+        print("undo")
+        if (len(self.last_move) == 0): return
+        last = self.last_move.pop(0)
+        print(type(last), last)
+        self.next_move.insert(0, last)
+        print(f"undo to {last} of {self.last_move}")
+        print(self.next_move)
+        self.render_new_root(last)
+
+    def redo (self):
+        print('redo')
+        if (len(self.next_move) == 0): return
+        next = self.next_move.pop(0)
+        self.last_move.insert(0, next)
+        print(f"redo to {next} of {self.DockOption}")
+        print(self.last_move)
+        self.render_new_root(next)
+
+    def render_new_root(self, dir):
+        self.filePath.setText(f"Current: {dir}")
+        self.tree.setRootIndex(self.dialog.index(dir))
+
+
+
+
+
+
+
+
+
+
+
+
