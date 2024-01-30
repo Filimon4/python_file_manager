@@ -1,28 +1,34 @@
-from PySide6.QtWidgets import QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtWidgets import QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
 from PySide6.QtCore import QDir, QSize, QModelIndex, QFile
-from PySide6.QtGui import QIcon
 from ui_mainwindow import Ui_MainWindow
+from PySide6.QtUiTools import QUiLoader
+import sys
 
 class StartWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-
+        # logic
         self.last_move = []
         self.next_move = []
         self.currentDir = ''
 
+        # ui.ui
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("File title")
         self.setGeometry(100, 100, 900, 600)
 
+        # current dir
         self.filePath = self.ui.directory
         self.filePath.setText(f"Current: {QDir.root().dirName()}")
 
+        # QFileSystemModel
         self.dialog = QFileSystemModel(self)
         self.dialog.setRootPath(QDir.currentPath())
         self.dialog.rootPathChanged.connect(self.pathChanged)
 
+        # QTreeView
+        self.tree_ui = self.ui.treeView
         self.tree = QTreeView(self.ui.treeView)
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
         self.tree.setModel(self.dialog)
@@ -30,6 +36,16 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.currentDir = QDir.root().dirName()
         self.tree.setRootIndex(self.dialog.index(self.currentDir))
 
+        #Actions
+        self.about_action = self.ui.actionAbout
+        self.quit_action = self.ui.actionQuit
+        self.about_qt_action = self.ui.actionAbout_Qt
+
+        self.newFile_action = self.ui.actionMake_folder
+        self.newFolder_action = self.ui.actionNew_File
+        self.delete_action = self.ui.actionDelete_folder
+
+        #Ui buttons
         self.redo_btn = self.ui.redo_btn
         self.undo_btn = self.ui.undo_btn
         self.levelUp_btn = self.ui.up_btn
@@ -42,6 +58,15 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.paste_btn = self.ui.paste_btn
         self.cut_btn = self.ui.cut_btn
 
+        # connect actions
+        self.quit_action.triggered.connect(self.quit)
+        self.about_qt_action.triggered.connect(self.about_qt)
+        self.about_action.triggered.connect(self.about)
+        self.newFile_action.triggered.connect(self.newFolder)
+        self.newFolder_action.triggered.connect(self.newFile)
+        self.delete_action.triggered.connect(self.delete)
+
+        # connect buttons
         self.redo_btn.clicked.connect(self.redo)
         self.undo_btn.clicked.connect(self.undo)
         self.levelUp_btn.clicked.connect(self.parent)
@@ -54,15 +79,12 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.delete_btn.clicked.connect(self.delete)
 
     def newFolder(self):
-        folderName, ok = QInputDialog.getText(self, "QInputDialog.getText()", "Folder name: ", QLineEdit.Normal)
+        folderName, ok = QInputDialog.getText(self, "Ввод", "Folder name: ", QLineEdit.Normal)
         if ok:
             QDir(self.currentDir).mkdir(f"{folderName}")
         print('new folder')
     def newFile(self):
-
-        # testName = QDialog(self)
-        # testName.show()
-        fileName, ok = QInputDialog.getText(self, "QInputDialog.getText()", "Folder name: ", QLineEdit.Normal)
+        fileName, ok = QInputDialog.getText(self, "Ввод", "Folder name: ", QLineEdit.Normal)
         file = f"{self.currentDir}/{fileName}"
         print(file)
         with open(file, "w") as file:
@@ -71,13 +93,13 @@ class StartWindow(QMainWindow, Ui_MainWindow):
     def delete(self):
         index = self.tree.currentIndex()
         if index:
-            file = self.tree.model().data(index)
+            fileName = self.tree.model().data(index)
             filePath = self.dialog.fileInfo(index)
+            desc = f"Do you want to delete folder: \"{fileName}\""
             if (filePath.dir().path() == self.currentDir):
-                willDelete = QMessageBox.question(self, "Delete file", f"Do you want to delete {file}", QMessageBox.Yes|QMessageBox.No)
+                willDelete = QMessageBox.question(self, "Delete folder", desc, QMessageBox.Yes|QMessageBox.No)
                 if willDelete == QMessageBox.StandardButton.Yes:
                     self.dialog.remove(index)
-            print(f"File: {file}")
         print('new delete')
     def copy(self):
         print('new copy')
@@ -103,7 +125,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         if (len(dirs) == 1):
             self.render_new_root('')
         else:
-            self.render_new_root(dirs[0])
+            path = '/'.join(dirs[0:len(dirs)-1])
+            self.render_new_root(path)
 
 
     def undo (self):
@@ -136,8 +159,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.filePath.setText(f"Current: {dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
-        # print(f"last moves: {self.last_move}")
-        # print(f"next moves: {self.next_move}")
+        print(f"last moves: {self.last_move}")
+        print(f"next moves: {self.next_move}")
 
         self.update_move_btn()
 
@@ -160,13 +183,22 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         else:
             self.levelUp_btn.setEnabled(True)
 
+    def quit(self):
+        QApplication.quit()
 
+    def about_qt(self):
+        QApplication.aboutQt()
 
+    def about(self):
+        dialog = QMessageBox()
+        dialog.setText('''About\n\nThis is my college project\nBasic file explorer''')
+        dialog.setWindowTitle("About")
+        dialog.setIcon(QMessageBox.Icon.Information)
+        dialog.exec()
 
+    # tree view events
+    def resizeEvent(self, event):
+        self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 
-
-
-
-
-
-
+    def showEvent(self, event):
+        self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
