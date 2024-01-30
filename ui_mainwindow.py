@@ -17,16 +17,53 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QTreeView, QWidget)
-import icons_rc
+    QLayout, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
+    QTreeView, QVBoxLayout, QWidget)
+import rc_icons
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(916, 571)
+        MainWindow.resize(975, 571)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setTabletTracking(False)
+        MainWindow.setStyleSheet(u"#centralwidget {\n"
+"	background-color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"#copy_btn {\n"
+"	border: 1px solid black;\n"
+"	border-radius: 7px;\n"
+"	padding: 5px;\n"
+"	\n"
+"}\n"
+"\n"
+"#copy_btn:hover {\n"
+"	background-color: rgb(0, 141, 197);\n"
+"	border: 1px solid rgb(0, 172, 240);\n"
+"}\n"
+"\n"
+"QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: 2px solid #808080;\n"
+"	padding: 5px;\n"
+"	border-radius: 5px;\n"
+"}\n"
+"            \n"
+"QPushButton:hover {\n"
+"	background-color: #87CEFA; /* Light blue on hover */\n"
+"}\n"
+"            \n"
+"QPushButton:pressed {\n"
+"	border: 2px solid #0000FF; /* Blue border on press */\n"
+"}\n"
+"")
         self.actionQuit = QAction(MainWindow)
         self.actionQuit.setObjectName(u"actionQuit")
         icon = QIcon()
@@ -82,83 +119,87 @@ class Ui_MainWindow(object):
         self.actionMove.setIcon(icon9)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.horizontalLayoutWidget = QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
-        self.horizontalLayoutWidget.setGeometry(QRect(10, 0, 481, 71))
-        self.horizontalLayout = QHBoxLayout(self.horizontalLayoutWidget)
+        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setSpacing(10)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.cope_btn = QPushButton(self.horizontalLayoutWidget)
-        self.cope_btn.setObjectName(u"cope_btn")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.cope_btn.sizePolicy().hasHeightForWidth())
-        self.cope_btn.setSizePolicy(sizePolicy)
-        self.cope_btn.setIcon(icon1)
-        self.cope_btn.setIconSize(QSize(40, 40))
+        self.horizontalLayout.setSizeConstraint(QLayout.SetMaximumSize)
+        self.copy_btn = QPushButton(self.centralwidget)
+        self.copy_btn.setObjectName(u"copy_btn")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.copy_btn.sizePolicy().hasHeightForWidth())
+        self.copy_btn.setSizePolicy(sizePolicy1)
+        self.copy_btn.setIcon(icon1)
+        self.copy_btn.setIconSize(QSize(40, 40))
 
-        self.horizontalLayout.addWidget(self.cope_btn)
+        self.horizontalLayout.addWidget(self.copy_btn)
 
-        self.cut_btn = QPushButton(self.horizontalLayoutWidget)
+        self.cut_btn = QPushButton(self.centralwidget)
         self.cut_btn.setObjectName(u"cut_btn")
-        sizePolicy.setHeightForWidth(self.cut_btn.sizePolicy().hasHeightForWidth())
-        self.cut_btn.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.cut_btn.sizePolicy().hasHeightForWidth())
+        self.cut_btn.setSizePolicy(sizePolicy1)
         self.cut_btn.setIcon(icon3)
         self.cut_btn.setIconSize(QSize(40, 40))
 
         self.horizontalLayout.addWidget(self.cut_btn)
 
-        self.paste_btn = QPushButton(self.horizontalLayoutWidget)
+        self.paste_btn = QPushButton(self.centralwidget)
         self.paste_btn.setObjectName(u"paste_btn")
-        sizePolicy.setHeightForWidth(self.paste_btn.sizePolicy().hasHeightForWidth())
-        self.paste_btn.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.paste_btn.sizePolicy().hasHeightForWidth())
+        self.paste_btn.setSizePolicy(sizePolicy1)
         self.paste_btn.setIcon(icon2)
         self.paste_btn.setIconSize(QSize(40, 40))
 
         self.horizontalLayout.addWidget(self.paste_btn)
 
-        self.newFile_btn = QPushButton(self.horizontalLayoutWidget)
+        self.newFile_btn = QPushButton(self.centralwidget)
         self.newFile_btn.setObjectName(u"newFile_btn")
-        sizePolicy.setHeightForWidth(self.newFile_btn.sizePolicy().hasHeightForWidth())
-        self.newFile_btn.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.newFile_btn.sizePolicy().hasHeightForWidth())
+        self.newFile_btn.setSizePolicy(sizePolicy1)
         self.newFile_btn.setIcon(icon8)
         self.newFile_btn.setIconSize(QSize(40, 40))
 
         self.horizontalLayout.addWidget(self.newFile_btn)
 
-        self.newFolde_btn = QPushButton(self.horizontalLayoutWidget)
-        self.newFolde_btn.setObjectName(u"newFolde_btn")
-        sizePolicy.setHeightForWidth(self.newFolde_btn.sizePolicy().hasHeightForWidth())
-        self.newFolde_btn.setSizePolicy(sizePolicy)
-        self.newFolde_btn.setIcon(icon6)
-        self.newFolde_btn.setIconSize(QSize(40, 40))
+        self.newFolder_btn = QPushButton(self.centralwidget)
+        self.newFolder_btn.setObjectName(u"newFolder_btn")
+        sizePolicy1.setHeightForWidth(self.newFolder_btn.sizePolicy().hasHeightForWidth())
+        self.newFolder_btn.setSizePolicy(sizePolicy1)
+        self.newFolder_btn.setIcon(icon6)
+        self.newFolder_btn.setIconSize(QSize(40, 40))
 
-        self.horizontalLayout.addWidget(self.newFolde_btn)
+        self.horizontalLayout.addWidget(self.newFolder_btn)
 
-        self.delete_btn = QPushButton(self.horizontalLayoutWidget)
+        self.delete_btn = QPushButton(self.centralwidget)
         self.delete_btn.setObjectName(u"delete_btn")
-        sizePolicy.setHeightForWidth(self.delete_btn.sizePolicy().hasHeightForWidth())
-        self.delete_btn.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.delete_btn.sizePolicy().hasHeightForWidth())
+        self.delete_btn.setSizePolicy(sizePolicy1)
         self.delete_btn.setIcon(icon7)
         self.delete_btn.setIconSize(QSize(40, 40))
 
         self.horizontalLayout.addWidget(self.delete_btn)
 
-        self.horizontalLayoutWidget_2 = QWidget(self.centralwidget)
-        self.horizontalLayoutWidget_2.setObjectName(u"horizontalLayoutWidget_2")
-        self.horizontalLayoutWidget_2.setGeometry(QRect(10, 80, 881, 41))
-        self.horizontalLayout_2 = QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.horizontalSpacer = QSpacerItem(250, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.undo_btn = QPushButton(self.horizontalLayoutWidget_2)
+        self.undo_btn = QPushButton(self.centralwidget)
         self.undo_btn.setObjectName(u"undo_btn")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.undo_btn.sizePolicy().hasHeightForWidth())
-        self.undo_btn.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.undo_btn.sizePolicy().hasHeightForWidth())
+        self.undo_btn.setSizePolicy(sizePolicy2)
         icon10 = QIcon()
         icon10.addFile(u":/imgs_file_manager/undo-alt.png", QSize(), QIcon.Normal, QIcon.Off)
         self.undo_btn.setIcon(icon10)
@@ -166,10 +207,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.undo_btn)
 
-        self.redo_btn = QPushButton(self.horizontalLayoutWidget_2)
+        self.redo_btn = QPushButton(self.centralwidget)
         self.redo_btn.setObjectName(u"redo_btn")
-        sizePolicy1.setHeightForWidth(self.redo_btn.sizePolicy().hasHeightForWidth())
-        self.redo_btn.setSizePolicy(sizePolicy1)
+        self.redo_btn.setEnabled(True)
+        sizePolicy2.setHeightForWidth(self.redo_btn.sizePolicy().hasHeightForWidth())
+        self.redo_btn.setSizePolicy(sizePolicy2)
         icon11 = QIcon()
         icon11.addFile(u":/imgs_file_manager/redo-alt.png", QSize(), QIcon.Normal, QIcon.Off)
         self.redo_btn.setIcon(icon11)
@@ -177,10 +219,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.redo_btn)
 
-        self.up_btn = QPushButton(self.horizontalLayoutWidget_2)
+        self.up_btn = QPushButton(self.centralwidget)
         self.up_btn.setObjectName(u"up_btn")
-        sizePolicy1.setHeightForWidth(self.up_btn.sizePolicy().hasHeightForWidth())
-        self.up_btn.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.up_btn.sizePolicy().hasHeightForWidth())
+        self.up_btn.setSizePolicy(sizePolicy2)
         icon12 = QIcon()
         icon12.addFile(u":/imgs_file_manager/level-up.png", QSize(), QIcon.Normal, QIcon.Off)
         self.up_btn.setIcon(icon12)
@@ -188,12 +230,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.up_btn)
 
-        self.directory = QLabel(self.horizontalLayoutWidget_2)
+        self.directory = QLabel(self.centralwidget)
         self.directory.setObjectName(u"directory")
 
         self.horizontalLayout_2.addWidget(self.directory)
 
-        self.find = QLabel(self.horizontalLayoutWidget_2)
+        self.find = QLabel(self.centralwidget)
         self.find.setObjectName(u"find")
 
         self.horizontalLayout_2.addWidget(self.find)
@@ -203,20 +245,23 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setStretch(2, 1)
         self.horizontalLayout_2.setStretch(3, 8)
         self.horizontalLayout_2.setStretch(4, 4)
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+
         self.treeView = QTreeView(self.centralwidget)
         self.treeView.setObjectName(u"treeView")
         self.treeView.setEnabled(True)
-        self.treeView.setGeometry(QRect(10, 131, 881, 381))
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.treeView.sizePolicy().hasHeightForWidth())
-        self.treeView.setSizePolicy(sizePolicy2)
+        sizePolicy.setHeightForWidth(self.treeView.sizePolicy().hasHeightForWidth())
+        self.treeView.setSizePolicy(sizePolicy)
         self.treeView.setMinimumSize(QSize(1, 0))
+        self.treeView.setMaximumSize(QSize(1000000, 100000))
+
+        self.verticalLayout.addWidget(self.treeView)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 916, 25))
+        self.menubar.setGeometry(QRect(0, 0, 975, 26))
         self.menuEdit = QMenu(self.menubar)
         self.menuEdit.setObjectName(u"menuEdit")
         self.menuFile = QMenu(self.menubar)
@@ -264,11 +309,11 @@ class Ui_MainWindow(object):
         self.actionDelete_folder.setText(QCoreApplication.translate("MainWindow", u"Delete", None))
         self.actionNew_File.setText(QCoreApplication.translate("MainWindow", u"New File", None))
         self.actionMove.setText(QCoreApplication.translate("MainWindow", u"Move", None))
-        self.cope_btn.setText("")
+        self.copy_btn.setText("")
         self.cut_btn.setText("")
         self.paste_btn.setText("")
         self.newFile_btn.setText("")
-        self.newFolde_btn.setText("")
+        self.newFolder_btn.setText("")
         self.delete_btn.setText("")
         self.undo_btn.setText("")
         self.redo_btn.setText("")

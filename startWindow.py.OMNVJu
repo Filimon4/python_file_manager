@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtWidgets import QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
 from PySide6.QtCore import QDir, QSize, QModelIndex, QFile
 from PySide6.QtGui import QIcon
 from ui_mainwindow import Ui_MainWindow
@@ -72,12 +72,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         index = self.tree.currentIndex()
         if index:
             file = self.tree.model().data(index)
-            filePath = self.dialog.fileInfo(index)
-            if (filePath.dir().path() == self.currentDir):
-                willDelete = QMessageBox.question(self, "Delete file", f"Do you want to delete {file}", QMessageBox.Yes|QMessageBox.No)
-                if willDelete == QMessageBox.StandardButton.Yes:
-                    self.dialog.remove(index)
-            print(f"File: {file}")
+            print(index.parent(), file)
         print('new delete')
     def copy(self):
         print('new copy')
@@ -136,8 +131,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.filePath.setText(f"Current: {dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
-        # print(f"last moves: {self.last_move}")
-        # print(f"next moves: {self.next_move}")
+        print(f"last moves: {self.last_move}")
+        print(f"next moves: {self.next_move}")
 
         self.update_move_btn()
 

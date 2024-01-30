@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
-from PySide6.QtCore import QDir, QSize, QModelIndex, QFile
+from PySide6.QtWidgets import QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtCore import QDir, QSize
 from PySide6.QtGui import QIcon
 from ui_mainwindow import Ui_MainWindow
 
@@ -36,7 +36,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.update_move_btn()
 
         self.newFolder_btn = self.ui.newFolder_btn
-        self.newFile_btn = self.ui.newFile_btn
+        self.newFile_btn = self.ui.newFolder_btn
         self.delete_btn = self.ui.delete_btn
         self.copy_btn = self.ui.copy_btn
         self.paste_btn = self.ui.paste_btn
@@ -54,30 +54,10 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.delete_btn.clicked.connect(self.delete)
 
     def newFolder(self):
-        folderName, ok = QInputDialog.getText(self, "QInputDialog.getText()", "Folder name: ", QLineEdit.Normal)
-        if ok:
-            QDir(self.currentDir).mkdir(f"{folderName}")
         print('new folder')
     def newFile(self):
-
-        # testName = QDialog(self)
-        # testName.show()
-        fileName, ok = QInputDialog.getText(self, "QInputDialog.getText()", "Folder name: ", QLineEdit.Normal)
-        file = f"{self.currentDir}/{fileName}"
-        print(file)
-        with open(file, "w") as file:
-            pass
         print('new file')
     def delete(self):
-        index = self.tree.currentIndex()
-        if index:
-            file = self.tree.model().data(index)
-            filePath = self.dialog.fileInfo(index)
-            if (filePath.dir().path() == self.currentDir):
-                willDelete = QMessageBox.question(self, "Delete file", f"Do you want to delete {file}", QMessageBox.Yes|QMessageBox.No)
-                if willDelete == QMessageBox.StandardButton.Yes:
-                    self.dialog.remove(index)
-            print(f"File: {file}")
         print('new delete')
     def copy(self):
         print('new copy')
@@ -85,6 +65,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         print('new cut')
     def paste(self):
         print('new paste')
+
 
     def pathChanged(self, path):
         print(path)
@@ -136,10 +117,10 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.filePath.setText(f"Current: {dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
-        # print(f"last moves: {self.last_move}")
-        # print(f"next moves: {self.next_move}")
+        print(f"last moves: {self.last_move}")
+        print(f"next moves: {self.next_move}")
 
-        self.update_move_btn()
+        self.update_btn()
 
     def update_move_btn(self):
         len_next = len(self.next_move)

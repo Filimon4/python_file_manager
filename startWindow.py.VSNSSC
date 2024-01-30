@@ -75,8 +75,6 @@ class StartWindow(QMainWindow, Ui_MainWindow):
             filePath = self.dialog.fileInfo(index)
             if (filePath.dir().path() == self.currentDir):
                 willDelete = QMessageBox.question(self, "Delete file", f"Do you want to delete {file}", QMessageBox.Yes|QMessageBox.No)
-                if willDelete == QMessageBox.StandardButton.Yes:
-                    self.dialog.remove(index)
             print(f"File: {file}")
         print('new delete')
     def copy(self):

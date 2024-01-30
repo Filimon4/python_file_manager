@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtWidgets import QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
 from PySide6.QtCore import QDir, QSize, QModelIndex, QFile
 from PySide6.QtGui import QIcon
 from ui_mainwindow import Ui_MainWindow
@@ -73,10 +73,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         if index:
             file = self.tree.model().data(index)
             filePath = self.dialog.fileInfo(index)
-            if (filePath.dir().path() == self.currentDir):
-                willDelete = QMessageBox.question(self, "Delete file", f"Do you want to delete {file}", QMessageBox.Yes|QMessageBox.No)
-                if willDelete == QMessageBox.StandardButton.Yes:
-                    self.dialog.remove(index)
+            print(filePath.dir().path())
+            print(self.currentDir)
             print(f"File: {file}")
         print('new delete')
     def copy(self):
