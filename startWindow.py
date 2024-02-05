@@ -1,8 +1,7 @@
-from PySide6.QtWidgets import QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
-from PySide6.QtCore import QDir, QSize, QModelIndex, QFile
+from PySide6.QtWidgets import QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtCore import QDir, QSize, QModelIndex, QFile, QIODevice
 from ui_mainwindow import Ui_MainWindow
-from PySide6.QtUiTools import QUiLoader
-import sys
+import sys, shutil, os
 
 class StartWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -11,11 +10,12 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.last_move = []
         self.next_move = []
         self.currentDir = ''
+        self.savedFiles = []
 
         # ui.ui
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle("File title")
+        self.setWindowTitle("File Explorer")
         self.setGeometry(100, 100, 900, 600)
 
         # current dir
@@ -25,7 +25,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         # QFileSystemModel
         self.dialog = QFileSystemModel(self)
         self.dialog.setRootPath(QDir.currentPath())
-        self.dialog.rootPathChanged.connect(self.pathChanged)
+        # self.dialog.rootPathChanged.connect(self.pathChanged)
 
         # QTreeView
         self.tree_ui = self.ui.treeView
@@ -35,6 +35,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.tree.doubleClicked.connect(self.treeClicked)
         self.currentDir = QDir.root().dirName()
         self.tree.setRootIndex(self.dialog.index(self.currentDir))
+        self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         #Actions
         self.about_action = self.ui.actionAbout
@@ -79,6 +80,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.delete_btn.clicked.connect(self.delete)
 
     def newFolder(self):
+        # TODO: use os.mkdir function
         folderName, ok = QInputDialog.getText(self, "Ввод", "Folder name: ", QLineEdit.Normal)
         if ok:
             QDir(self.currentDir).mkdir(f"{folderName}")
@@ -101,15 +103,62 @@ class StartWindow(QMainWindow, Ui_MainWindow):
                 if willDelete == QMessageBox.StandardButton.Yes:
                     self.dialog.remove(index)
         print('new delete')
+        # intersing code
+
+        # if(model->fileInfo(index).isDir())
+        # {
+        #     // directory
+        #     model->rmdir(index); (or os.rmdir)
+        #     shutil.rmtree(str)
+        # }
+        # else
+        # {
+        #     // file
+        #     model->remove(index);
+        # }
+
+    def getSelectedFiles(self):
+        files = self.tree.selectionModel().selectedIndexes()
+        uniqueFiles = []
+        for file in files:
+            path = self.dialog.filePath(file)
+            if not path in uniqueFiles:
+                uniqueFiles.append(path)
+        uniqueFiles = [self.dialog.index(x) for x in uniqueFiles]
+        return uniqueFiles
+
     def copy(self):
+        files = self.getSelectedFiles()
+        self.savedFiles = files
         print('new copy')
     def cut(self):
         print('new cut')
-    def paste(self):
-        print('new paste')
 
-    def pathChanged(self, path):
-        print(path)
+
+    def paste(self):
+        for file in self.savedFiles:
+            if self.dialog.fileInfo(file).isDir():
+                filePath = self.dialog.filePath(file)
+                fileName = self.dialog.fileName(file)
+
+                files = os.listdir(self.currentDir)
+
+                if os.path.isdir(filePath):
+                    counter = 0
+                    for f in files:
+                        if f.startswith(fileName):
+                            counter += 1
+                            print(f, counter)
+                    if counter == 0 or counter == 1:
+                        shutil.copytree(filePath, f"{self.currentDir}/{fileName} - copy")
+                    else:
+                        shutil.copytree(filePath, f"{self.currentDir}/{fileName} - copy ({counter})")
+                else:
+                    shutil.copytree(filePath, f"{self.currentDir}/{fileName}")
+            elif self.dialog.fileInfo(file).isFile():
+                filePath = self.dialog.filePath(file)
+                fileName = self.dialog.fileName(file)
+                shutil.copy2(filePath, f"{self.currentDir}/{fileName}")
 
     def btn_clicked(self):
         print("clicked")
@@ -121,6 +170,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.render_new_root(file)
 
     def parent (self):
+        # TODO: Can be used os.path.join
         dirs = self.currentDir.split('/')
         if (len(dirs) == 1):
             self.render_new_root('')
@@ -159,8 +209,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.filePath.setText(f"Current: {dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
-        print(f"last moves: {self.last_move}")
-        print(f"next moves: {self.next_move}")
+        # print(f"last moves: {self.last_move}")
+        # print(f"next moves: {self.next_move}")
 
         self.update_move_btn()
 
@@ -202,3 +252,4 @@ class StartWindow(QMainWindow, Ui_MainWindow):
 
     def showEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
+
