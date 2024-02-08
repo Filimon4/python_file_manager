@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>C:/Users/Efim/Downloads/back_up.png</file>
-        <file>C:/Users/Efim/Downloads/back_next.png</file>
-        <file>C:/Users/Efim/Downloads/back_prev.png</file>
         <file>imgs_file_manager/add-document.png</file>
         <file>imgs_file_manager/add-folder.png</file>
         <file>imgs_file_manager/circle-xmark.png</file>

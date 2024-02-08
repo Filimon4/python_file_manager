@@ -79,6 +79,15 @@ QPushButton:pressed {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>copy</string>
+        </property>
+        <property name="statusTip">
+         <string>copy</string>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -101,6 +110,12 @@ QPushButton:pressed {
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>cut</string>
+        </property>
+        <property name="statusTip">
+         <string>cut</string>
         </property>
         <property name="text">
          <string/>
@@ -125,6 +140,12 @@ QPushButton:pressed {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>paste</string>
+        </property>
+        <property name="statusTip">
+         <string>paste</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -147,6 +168,12 @@ QPushButton:pressed {
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>newFile</string>
+        </property>
+        <property name="statusTip">
+         <string>newFile</string>
         </property>
         <property name="text">
          <string/>
@@ -171,6 +198,12 @@ QPushButton:pressed {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>newFolder</string>
+        </property>
+        <property name="statusTip">
+         <string>newFolder</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -193,6 +226,12 @@ QPushButton:pressed {
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>delete</string>
+        </property>
+        <property name="statusTip">
+         <string>delete</string>
         </property>
         <property name="text">
          <string/>
@@ -353,7 +392,7 @@ QPushButton:pressed {
      <x>0</x>
      <y>0</y>
      <width>975</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtWidgets import QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QListView, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
 from PySide6.QtCore import QDir, QSize, QModelIndex, QFile, QIODevice
 from ui_mainwindow import Ui_MainWindow
 import sys, shutil, os
@@ -25,11 +25,10 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         # QFileSystemModel
         self.dialog = QFileSystemModel(self)
         self.dialog.setRootPath(QDir.currentPath())
-        # self.dialog.rootPathChanged.connect(self.pathChanged)
 
         # QTreeView
         self.tree_ui = self.ui.treeView
-        self.tree = QTreeView(self.ui.treeView)
+        self.tree = QListView(self.ui.treeView)
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
         self.tree.setModel(self.dialog)
         self.tree.doubleClicked.connect(self.treeClicked)
@@ -45,6 +44,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.newFile_action = self.ui.actionMake_folder
         self.newFolder_action = self.ui.actionNew_File
         self.delete_action = self.ui.actionDelete_folder
+        self.rename_action = self.ui.actionRename
 
         #Ui buttons
         self.redo_btn = self.ui.redo_btn
@@ -66,6 +66,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.newFile_action.triggered.connect(self.newFolder)
         self.newFolder_action.triggered.connect(self.newFile)
         self.delete_action.triggered.connect(self.delete)
+        self.rename_action.triggered.connect(self.rename)
 
         # connect buttons
         self.redo_btn.clicked.connect(self.redo)
@@ -86,36 +87,34 @@ class StartWindow(QMainWindow, Ui_MainWindow):
             QDir(self.currentDir).mkdir(f"{folderName}")
         print('new folder')
     def newFile(self):
-        fileName, ok = QInputDialog.getText(self, "Ввод", "Folder name: ", QLineEdit.Normal)
+        fileName, ok = QInputDialog.getText(self, "Ввод", "File name: ", QLineEdit.Normal)
         file = f"{self.currentDir}/{fileName}"
         print(file)
         with open(file, "w") as file:
             pass
         print('new file')
-    def delete(self):
-        index = self.tree.currentIndex()
-        if index:
-            fileName = self.tree.model().data(index)
-            filePath = self.dialog.fileInfo(index)
-            desc = f"Do you want to delete folder: \"{fileName}\""
-            if (filePath.dir().path() == self.currentDir):
-                willDelete = QMessageBox.question(self, "Delete folder", desc, QMessageBox.Yes|QMessageBox.No)
-                if willDelete == QMessageBox.StandardButton.Yes:
+    def delete(self, items = []):
+        indexes = self.getSelectedFiles()
+        if items:
+            indexes = items
+        print(indexes)
+        if len(indexes) > 0:
+            quest = f"Do you want to delete {len(indexes)} items"
+            willDelete = QMessageBox.question(self, "Delete items", quest, QMessageBox.Yes|QMessageBox.No)
+            if willDelete == QMessageBox.StandardButton.Yes:
+                for index in indexes:
+                    fileName = self.tree.model().data(index)
+                    filePath = self.dialog.fileInfo(index)
                     self.dialog.remove(index)
         print('new delete')
-        # intersing code
 
-        # if(model->fileInfo(index).isDir())
-        # {
-        #     // directory
-        #     model->rmdir(index); (or os.rmdir)
-        #     shutil.rmtree(str)
-        # }
-        # else
-        # {
-        #     // file
-        #     model->remove(index);
-        # }
+    def delete_cut_items(self, items = []):
+        print(items)
+        for index in items:
+            fileName = self.tree.model().data(index)
+            filePath = self.dialog.fileInfo(index)
+            self.dialog.remove(index)
+        print('new delete')
 
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()
@@ -131,9 +130,17 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         files = self.getSelectedFiles()
         self.savedFiles = files
         print('new copy')
-    def cut(self):
-        print('new cut')
 
+    def cut(self):
+        # get selected files
+        files = self.savedFiles
+        if files:
+            quest = f"Do you want to cut {len(files)} items"
+            willDelete = QMessageBox.question(self, "Cut items", quest, QMessageBox.Yes|QMessageBox.No)
+            if willDelete == QMessageBox.StandardButton.Yes:
+                self.paste()
+                self.delete_cut_items(files)
+        print('new cut')
 
     def paste(self):
         for file in self.savedFiles:
@@ -159,9 +166,6 @@ class StartWindow(QMainWindow, Ui_MainWindow):
                 filePath = self.dialog.filePath(file)
                 fileName = self.dialog.fileName(file)
                 shutil.copy2(filePath, f"{self.currentDir}/{fileName}")
-
-    def btn_clicked(self):
-        print("clicked")
 
     def treeClicked(self, index):
         file = self.dialog.filePath(index)
@@ -205,14 +209,26 @@ class StartWindow(QMainWindow, Ui_MainWindow):
             self.last_move.insert(0, next)
         self.render_new_root(next)
 
+    def rename (self):
+        files = self.getSelectedFiles()
+        print(files)
+        if len(files) == 1:
+            itemPath = self.dialog.filePath(files[0])
+            item = QFile(itemPath)
+            fileName, ok = QInputDialog.getText(self, "Ввод", "New file name: ", QLineEdit.Normal)
+            filePath = f"{self.currentDir}/{fileName}"
+            if item.rename(filePath):
+                print("New file name")
+            else:
+                print("Cannot rename file")
+
+    # render new rootindex
     def render_new_root(self, dir):
         self.filePath.setText(f"Current: {dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
-        # print(f"last moves: {self.last_move}")
-        # print(f"next moves: {self.next_move}")
-
         self.update_move_btn()
+        self.tree.clearSelection()
 
     def update_move_btn(self):
         len_next = len(self.next_move)
@@ -246,10 +262,11 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         dialog.setIcon(QMessageBox.Icon.Information)
         dialog.exec()
 
-    # tree view events
+    # tree view resize
     def resizeEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 
     def showEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
+
 

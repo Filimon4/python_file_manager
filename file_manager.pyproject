@@ -1,5 +1,6 @@
 {
     "files": [
+        "FileView.py",
         "icons.qrc",
         "main.py",
         "mainwindow.ui",
