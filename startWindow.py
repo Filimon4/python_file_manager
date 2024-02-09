@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QListView, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
 from PySide6.QtCore import QDir, QSize, QModelIndex, QFile, QIODevice
+from PySide6.QtGui import QKeySequence, QShortcut
 from ui_mainwindow import Ui_MainWindow
+
 import sys, shutil, os
 
 class StartWindow(QMainWindow, Ui_MainWindow):
@@ -46,6 +48,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.delete_action = self.ui.actionDelete_folder
         self.rename_action = self.ui.actionRename
 
+
         #Ui buttons
         self.redo_btn = self.ui.redo_btn
         self.undo_btn = self.ui.undo_btn
@@ -79,6 +82,17 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.paste_btn.clicked.connect(self.paste)
         self.cut_btn.clicked.connect(self.cut)
         self.delete_btn.clicked.connect(self.delete)
+
+        # Shortcuts
+        self.copy_short = QShortcut(QKeySequence("Ctrl+A"), self)
+        self.copy_short.activated.connect(self.copy)
+        self.copy_short = QShortcut(QKeySequence("Ctrl+S"), self)
+        self.copy_short.activated.connect(self.paste)
+        self.copy_short = QShortcut(QKeySequence("Ctrl+Q"), self)
+        self.copy_short.activated.connect(self.cut)
+        self.copy_short = QShortcut(QKeySequence("Ctrl+D"), self)
+        self.copy_short.activated.connect(self.delete)
+
 
     def newFolder(self):
         # TODO: use os.mkdir function
@@ -211,7 +225,6 @@ class StartWindow(QMainWindow, Ui_MainWindow):
 
     def rename (self):
         files = self.getSelectedFiles()
-        print(files)
         if len(files) == 1:
             itemPath = self.dialog.filePath(files[0])
             item = QFile(itemPath)
