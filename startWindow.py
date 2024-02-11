@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QListView, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
-from PySide6.QtCore import QDir, QSize, QModelIndex, QFile, QIODevice
+from PySide6.QtWidgets import QPushButton, QFileDialog, QDialog, QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QListView, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
+from PySide6.QtCore import QFileInfo, QDir, QSize, QModelIndex, QFile, QIODevice, Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from ui_mainwindow import Ui_MainWindow
 
@@ -47,6 +47,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.newFolder_action = self.ui.actionNew_File
         self.delete_action = self.ui.actionDelete_folder
         self.rename_action = self.ui.actionRename
+        self.move_action = self.ui.actionMove
 
 
         #Ui buttons
@@ -70,6 +71,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.newFolder_action.triggered.connect(self.newFile)
         self.delete_action.triggered.connect(self.delete)
         self.rename_action.triggered.connect(self.rename)
+        self.move_action.triggered.connect(self.move)
 
         # connect buttons
         self.redo_btn.clicked.connect(self.redo)
@@ -139,6 +141,13 @@ class StartWindow(QMainWindow, Ui_MainWindow):
                 uniqueFiles.append(path)
         uniqueFiles = [self.dialog.index(x) for x in uniqueFiles]
         return uniqueFiles
+
+    def getSingleSelectedFile(self):
+        files = self.getSelectedFiles()
+        if len(files) == 1:
+            return files[0]
+        else:
+            return None
 
     def copy(self):
         files = self.getSelectedFiles()
@@ -224,9 +233,9 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.render_new_root(next)
 
     def rename (self):
-        files = self.getSelectedFiles()
-        if len(files) == 1:
-            itemPath = self.dialog.filePath(files[0])
+        file = self.getSingleSelectedFile()
+        if file:
+            itemPath = self.dialog.filePath(file)
             item = QFile(itemPath)
             fileName, ok = QInputDialog.getText(self, "Ввод", "New file name: ", QLineEdit.Normal)
             filePath = f"{self.currentDir}/{fileName}"
@@ -234,6 +243,27 @@ class StartWindow(QMainWindow, Ui_MainWindow):
                 print("New file name")
             else:
                 print("Cannot rename file")
+
+    def move (self):
+        file = self.getSingleSelectedFile()
+        if file:
+            fileDialog = QDialog(self)
+            quest = f"Do you want to move {file}"
+            willDelete = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
+            if willDelete == QMessageBox.StandardButton.Yes:
+                dia = FolderSelectorDialog()
+                result = dia.exec_()
+
+                if result == QDialog.Accepted:
+                    selected_directory = dia.tree_view.currentIndex().data(Qt.DisplayRole)
+                    print(dia.tree_view.currentIndex().data(Qt.DisplayRole))
+                    print(self.dialog.filePath(dia.tree_view.currentIndex()))
+
+                # if folderName:
+                #     quest = f"Do you want to move {file} to {folderName}"
+                #     willDelete = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
+                #     if willDelete == QMessageBox.StandardButton.Yes:
+                #         print('move')
 
     # render new rootindex
     def render_new_root(self, dir):
@@ -282,4 +312,68 @@ class StartWindow(QMainWindow, Ui_MainWindow):
     def showEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 
+
+class FolderSelectorDialog(QDialog):
+    def __init__(self):
+        super(FolderSelectorDialog, self).__init__()
+
+        # Set up the UI components
+        self.init_ui()
+
+    def init_ui(self):
+        # Create a layout
+        layout = QVBoxLayout()
+
+        # Create a QLineEdit to display the selected folder name
+        self.folder_name_line_edit = QLineEdit()
+        self.folder_name_line_edit.setReadOnly(True)
+        layout.addWidget(self.folder_name_line_edit)
+
+        # Create a QTreeView
+        self.tree_view = QTreeView()
+        layout.addWidget(self.tree_view)
+
+        # Create a QFileSystemModel
+        self.model = QFileSystemModel()
+        self.model.setRootPath(QDir.rootPath())  # You can set any initial root path here
+        self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)  # Show only directories
+        self.tree_view.setModel(self.model)
+
+        # Set the root index of the tree view to the root path
+        root_index = self.model.index(QDir.rootPath())
+
+        # Set up the buttons
+        ok_button = QPushButton("OK")
+        ok_button.clicked.connect(self.accept)
+        cancel_button = QPushButton("Cancel")
+        cancel_button.clicked.connect(self.reject)
+
+        # Add buttons to the layout
+        layout.addWidget(ok_button)
+        layout.addWidget(cancel_button)
+
+        # Set the layout for the dialog
+        self.setLayout(layout)
+
+        # Connect item selection signal to custom slot
+        self.tree_view.selectionModel().selectionChanged.connect(self.handle_selection_change)
+
+    def handle_selection_change(self, selected, deselected):
+            # Enable OK button only if an item is selected and it is a directory
+            selected_indexes = selected.indexes()
+            if selected_indexes:
+                current_index = selected_indexes[0]
+                selected_directory = self.model.filePath(current_index)
+                self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
+
+                # Update the QLineEdit with the selected folder name
+                self.folder_name_line_edit.setText(selected_directory)
+            else:
+                self.setEnabled_ok_button(False)
+                self.folder_name_line_edit.clear()
+
+    def setEnabled_ok_button(self, enabled):
+        # Enable or disable the OK button
+        ok_button = self.layout().itemAt(1).widget()  # Assumes OK button is the second item in layout
+        ok_button.setEnabled(enabled)
 
