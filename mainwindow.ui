@@ -64,215 +64,6 @@ QPushButton:pressed {
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0">
-      <property name="spacing">
-       <number>10</number>
-      </property>
-      <property name="sizeConstraint">
-       <enum>QLayout::SetMaximumSize</enum>
-      </property>
-      <item>
-       <widget class="QPushButton" name="copy_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>copy</string>
-        </property>
-        <property name="statusTip">
-         <string>copy</string>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/copy-alt.png</normaloff>:/imgs_file_manager/copy-alt.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="cut_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>cut</string>
-        </property>
-        <property name="statusTip">
-         <string>cut</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/scissors.png</normaloff>:/imgs_file_manager/scissors.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="paste_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>paste</string>
-        </property>
-        <property name="statusTip">
-         <string>paste</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/paste.png</normaloff>:/imgs_file_manager/paste.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="newFile_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>newFile</string>
-        </property>
-        <property name="statusTip">
-         <string>newFile</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/add-document.png</normaloff>:/imgs_file_manager/add-document.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="newFolder_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>newFolder</string>
-        </property>
-        <property name="statusTip">
-         <string>newFolder</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/add-folder.png</normaloff>:/imgs_file_manager/add-folder.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="delete_btn">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>delete</string>
-        </property>
-        <property name="statusTip">
-         <string>delete</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/imgs_file_manager/trash.png</normaloff>:/imgs_file_manager/trash.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>250</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,8,4">
       <item>
        <widget class="QPushButton" name="undo_btn">
@@ -291,8 +82,8 @@ QPushButton:pressed {
         </property>
         <property name="iconSize">
          <size>
-          <width>25</width>
-          <height>25</height>
+          <width>15</width>
+          <height>15</height>
          </size>
         </property>
        </widget>
@@ -317,8 +108,8 @@ QPushButton:pressed {
         </property>
         <property name="iconSize">
          <size>
-          <width>25</width>
-          <height>25</height>
+          <width>15</width>
+          <height>15</height>
          </size>
         </property>
        </widget>
@@ -337,14 +128,27 @@ QPushButton:pressed {
         </property>
         <property name="iconSize">
          <size>
-          <width>25</width>
-          <height>25</height>
+          <width>15</width>
+          <height>15</height>
          </size>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="directory">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 1px solid black;
+border-radius: 10px;
+
+
+</string>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -352,6 +156,11 @@ QPushButton:pressed {
       </item>
       <item>
        <widget class="QLabel" name="find">
+        <property name="styleSheet">
+         <string notr="true">border: 1px solid black;
+border-radius: 10px;
+</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -397,13 +206,13 @@ QPushButton:pressed {
    </property>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>Правка</string>
     </property>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Файл</string>
     </property>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
@@ -416,29 +225,42 @@ QPushButton:pressed {
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>Помощь</string>
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-   </widget>
    <addaction name="menuEdit"/>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionCopy"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionNew_File"/>
+   <addaction name="actionMake_folder"/>
+   <addaction name="actionMove"/>
+   <addaction name="actionRename"/>
+   <addaction name="actionDelete_folder"/>
+  </widget>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/imgs_file_manager/circle-xmark.png</normaloff>:/imgs_file_manager/circle-xmark.png</iconset>
    </property>
    <property name="text">
-    <string>Quit</string>
+    <string>Закрыть</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -447,7 +269,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/copy-alt.png</normaloff>:/imgs_file_manager/copy-alt.png</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string>Копирование</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -459,7 +281,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/paste.png</normaloff>:/imgs_file_manager/paste.png</iconset>
    </property>
    <property name="text">
-    <string>Paste</string>
+    <string>Вставка</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -471,7 +293,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/scissors.png</normaloff>:/imgs_file_manager/scissors.png</iconset>
    </property>
    <property name="text">
-    <string>Cut</string>
+    <string>Вырезание</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -480,7 +302,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/info.png</normaloff>:/imgs_file_manager/info.png</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>О программе</string>
    </property>
   </action>
   <action name="actionAbout_Qt">
@@ -489,7 +311,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/info.png</normaloff>:/imgs_file_manager/info.png</iconset>
    </property>
    <property name="text">
-    <string>About Qt</string>
+    <string>О Qt</string>
    </property>
   </action>
   <action name="actionRename">
@@ -498,7 +320,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/pen-square.png</normaloff>:/imgs_file_manager/pen-square.png</iconset>
    </property>
    <property name="text">
-    <string>Rename</string>
+    <string>Переименовать</string>
    </property>
   </action>
   <action name="actionMake_folder">
@@ -507,7 +329,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/add-folder.png</normaloff>:/imgs_file_manager/add-folder.png</iconset>
    </property>
    <property name="text">
-    <string>New Folder</string>
+    <string>Новая папка</string>
    </property>
   </action>
   <action name="actionDelete_folder">
@@ -516,7 +338,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/trash.png</normaloff>:/imgs_file_manager/trash.png</iconset>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string>Удаление</string>
    </property>
   </action>
   <action name="actionNew_File">
@@ -525,7 +347,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/add-document.png</normaloff>:/imgs_file_manager/add-document.png</iconset>
    </property>
    <property name="text">
-    <string>New File</string>
+    <string>Новый файл</string>
    </property>
   </action>
   <action name="actionMove">
@@ -534,7 +356,7 @@ QPushButton:pressed {
      <normaloff>:/imgs_file_manager/move-to-folder.png</normaloff>:/imgs_file_manager/move-to-folder.png</iconset>
    </property>
    <property name="text">
-    <string>Move</string>
+    <string>Перемещение</string>
    </property>
   </action>
  </widget>

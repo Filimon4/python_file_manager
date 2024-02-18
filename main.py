@@ -1,10 +1,9 @@
-import sys
 from PySide6.QtWidgets import QApplication
-from startWindow import StartWindow
+from startWindow import FileExplorerApp
 
 if __name__ == "__main__":
     app = QApplication([])
-    window = StartWindow()
+    window = FileExplorerApp()
     window.show()
     app.exec()
 

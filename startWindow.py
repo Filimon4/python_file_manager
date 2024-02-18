@@ -1,11 +1,58 @@
-from PySide6.QtWidgets import QPushButton, QFileDialog, QDialog, QAbstractItemView, QApplication, QMessageBox, QDialog, QLineEdit, QInputDialog, QSizePolicy, QMainWindow, QFileSystemModel, QListView, QTreeView, QWidget, QVBoxLayout, QLabel, QTreeWidget, QSplitter
-from PySide6.QtCore import QFileInfo, QDir, QSize, QModelIndex, QFile, QIODevice, Qt
+import sys
+import shutil
+import os
+
+from PySide6.QtWidgets import (
+    QPushButton, QAbstractItemView, QApplication,
+    QMessageBox, QDialog, QLineEdit, QInputDialog, QMainWindow,
+    QFileSystemModel, QListView, QTreeView,
+    QVBoxLayout
+)
+from PySide6.QtCore import (
+    QFileInfo, QDir, QSize,
+    QFile
+)
 from PySide6.QtGui import QKeySequence, QShortcut
 from ui_mainwindow import Ui_MainWindow
 
-import sys, shutil, os
+class FileSystem:
 
-class StartWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        pass
+
+class ActionsApp():
+
+    def __init__(self, app):
+        self.app = app
+        self.ui = app.ui
+
+        self.quit_action = self.ui.actionQuit
+
+        self.about_action = self.ui.actionAbout
+        self.about_qt_action = self.ui.actionAbout_Qt
+
+        self.newFile_action = self.ui.actionMake_folder
+        self.newFolder_action = self.ui.actionNew_File
+        self.delete_action = self.ui.actionDelete_folder
+        self.rename_action = self.ui.actionRename
+        self.move_action = self.ui.actionMove
+        self.copy_action = self.ui.actionCopy
+        self.paste_action = self.ui.actionPaste
+        self.cut_action = self.ui.actionCut
+
+        self.quit_action.triggered.connect(self.app.quit)
+        self.about_qt_action.triggered.connect(self.app.about_qt)
+        self.about_action.triggered.connect(self.app.about)
+        self.newFile_action.triggered.connect(self.app.newFolder)
+        self.newFolder_action.triggered.connect(self.app.newFile)
+        self.delete_action.triggered.connect(self.app.delete)
+        self.rename_action.triggered.connect(self.app.rename)
+        self.move_action.triggered.connect(self.app.move)
+        self.copy_action.triggered.connect(self.app.copy)
+        self.paste_action.triggered.connect(self.app.paste)
+        self.cut_action.triggered.connect(self.app.cut)
+
+class FileExplorerApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         # logic
@@ -17,12 +64,12 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         # ui.ui
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle("File Explorer")
+        self.setWindowTitle("Файловый менеджер")
         self.setGeometry(100, 100, 900, 600)
 
-        # current dir
+        # ui elements
         self.filePath = self.ui.directory
-        self.filePath.setText(f"Current: {QDir.root().dirName()}")
+        self.filePath.setText(f"{QDir.root().dirName()}")
 
         # QFileSystemModel
         self.dialog = QFileSystemModel(self)
@@ -39,16 +86,7 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         #Actions
-        self.about_action = self.ui.actionAbout
-        self.quit_action = self.ui.actionQuit
-        self.about_qt_action = self.ui.actionAbout_Qt
-
-        self.newFile_action = self.ui.actionMake_folder
-        self.newFolder_action = self.ui.actionNew_File
-        self.delete_action = self.ui.actionDelete_folder
-        self.rename_action = self.ui.actionRename
-        self.move_action = self.ui.actionMove
-
+        self.actions = ActionsApp(self)
 
         #Ui buttons
         self.redo_btn = self.ui.redo_btn
@@ -56,34 +94,10 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         self.levelUp_btn = self.ui.up_btn
         self.update_move_btn()
 
-        self.newFolder_btn = self.ui.newFolder_btn
-        self.newFile_btn = self.ui.newFile_btn
-        self.delete_btn = self.ui.delete_btn
-        self.copy_btn = self.ui.copy_btn
-        self.paste_btn = self.ui.paste_btn
-        self.cut_btn = self.ui.cut_btn
-
-        # connect actions
-        self.quit_action.triggered.connect(self.quit)
-        self.about_qt_action.triggered.connect(self.about_qt)
-        self.about_action.triggered.connect(self.about)
-        self.newFile_action.triggered.connect(self.newFolder)
-        self.newFolder_action.triggered.connect(self.newFile)
-        self.delete_action.triggered.connect(self.delete)
-        self.rename_action.triggered.connect(self.rename)
-        self.move_action.triggered.connect(self.move)
-
         # connect buttons
         self.redo_btn.clicked.connect(self.redo)
         self.undo_btn.clicked.connect(self.undo)
         self.levelUp_btn.clicked.connect(self.parent)
-
-        self.newFolder_btn.clicked.connect(self.newFolder)
-        self.newFile_btn.clicked.connect(self.newFile)
-        self.copy_btn.clicked.connect(self.copy)
-        self.paste_btn.clicked.connect(self.paste)
-        self.cut_btn.clicked.connect(self.cut)
-        self.delete_btn.clicked.connect(self.delete)
 
         # Shortcuts
         self.copy_short = QShortcut(QKeySequence("Ctrl+A"), self)
@@ -98,16 +112,16 @@ class StartWindow(QMainWindow, Ui_MainWindow):
 
     def newFolder(self):
         # TODO: use os.mkdir function
-        folderName, ok = QInputDialog.getText(self, "Ввод", "Folder name: ", QLineEdit.Normal)
+        folderName, ok = QInputDialog.getText(self, "Ввод", "Название папки: ", QLineEdit.Normal)
         if ok:
             QDir(self.currentDir).mkdir(f"{folderName}")
         print('new folder')
     def newFile(self):
-        fileName, ok = QInputDialog.getText(self, "Ввод", "File name: ", QLineEdit.Normal)
+        fileName, ok = QInputDialog.getText(self, "Ввод", "Название файла: ", QLineEdit.Normal)
         file = f"{self.currentDir}/{fileName}"
-        print(file)
-        with open(file, "w") as file:
-            pass
+        if ok:
+            with open(file, "w") as file:
+                pass
         print('new file')
     def delete(self, items = []):
         indexes = self.getSelectedFiles()
@@ -115,20 +129,16 @@ class StartWindow(QMainWindow, Ui_MainWindow):
             indexes = items
         print(indexes)
         if len(indexes) > 0:
-            quest = f"Do you want to delete {len(indexes)} items"
-            willDelete = QMessageBox.question(self, "Delete items", quest, QMessageBox.Yes|QMessageBox.No)
+            quest = f"Удалить {len(indexes)} элементов"
+            willDelete = QMessageBox.question(self, "Удаление", quest, QMessageBox.Yes|QMessageBox.No)
             if willDelete == QMessageBox.StandardButton.Yes:
                 for index in indexes:
-                    fileName = self.tree.model().data(index)
-                    filePath = self.dialog.fileInfo(index)
                     self.dialog.remove(index)
         print('new delete')
 
     def delete_cut_items(self, items = []):
         print(items)
         for index in items:
-            fileName = self.tree.model().data(index)
-            filePath = self.dialog.fileInfo(index)
             self.dialog.remove(index)
         print('new delete')
 
@@ -158,18 +168,22 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         # get selected files
         files = self.savedFiles
         if files:
-            quest = f"Do you want to cut {len(files)} items"
-            willDelete = QMessageBox.question(self, "Cut items", quest, QMessageBox.Yes|QMessageBox.No)
+            quest = f"Вырезать {len(files)} элементов"
+            willDelete = QMessageBox.question(self, "Вырезание", quest, QMessageBox.Yes|QMessageBox.No)
             if willDelete == QMessageBox.StandardButton.Yes:
                 self.paste()
                 self.delete_cut_items(files)
         print('new cut')
 
     def paste(self):
+        willPaste = QMessageBox.question(self, "Вставка", "Вставить файлы в настоящую директорию", QMessageBox.Yes|QMessageBox.No)
+        if not willPaste == QMessageBox.StandardButton.Yes:
+            return
         for file in self.savedFiles:
             if self.dialog.fileInfo(file).isDir():
                 filePath = self.dialog.filePath(file)
                 fileName = self.dialog.fileName(file)
+
 
                 files = os.listdir(self.currentDir)
 
@@ -192,13 +206,14 @@ class StartWindow(QMainWindow, Ui_MainWindow):
 
     def treeClicked(self, index):
         file = self.dialog.filePath(index)
-        self.filePath.setText(f"Current: {file}")
+        self.filePath.setText(f"{file}")
         self.last_move.insert(0, self.currentDir)
         self.render_new_root(file)
 
     def parent (self):
         # TODO: Can be used os.path.join
         dirs = self.currentDir.split('/')
+
         if (len(dirs) == 1):
             self.render_new_root('')
         else:
@@ -237,37 +252,37 @@ class StartWindow(QMainWindow, Ui_MainWindow):
         if file:
             itemPath = self.dialog.filePath(file)
             item = QFile(itemPath)
-            fileName, ok = QInputDialog.getText(self, "Ввод", "New file name: ", QLineEdit.Normal)
+            fileName, ok = QInputDialog.getText(self, "Ввод", "Новое имя: ", QLineEdit.Normal)
             filePath = f"{self.currentDir}/{fileName}"
             if item.rename(filePath):
                 print("New file name")
             else:
                 print("Cannot rename file")
 
+
+    def move_file(self, fromPath, toPath):
+        if fromPath and toPath:
+            shutil.move(fromPath, toPath)
+
     def move (self):
         file = self.getSingleSelectedFile()
         if file:
-            fileDialog = QDialog(self)
-            quest = f"Do you want to move {file}"
-            willDelete = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
-            if willDelete == QMessageBox.StandardButton.Yes:
-                dia = FolderSelectorDialog()
-                result = dia.exec_()
+            dia = FolderSelectorDialog()
+            result = dia.exec_()
 
-                if result == QDialog.Accepted:
-                    selected_directory = dia.tree_view.currentIndex().data(Qt.DisplayRole)
-                    print(dia.tree_view.currentIndex().data(Qt.DisplayRole))
-                    print(self.dialog.filePath(dia.tree_view.currentIndex()))
-
-                # if folderName:
-                #     quest = f"Do you want to move {file} to {folderName}"
-                #     willDelete = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
-                #     if willDelete == QMessageBox.StandardButton.Yes:
-                #         print('move')
+            if result == QDialog.Accepted:
+                selected_directory = self.dialog.filePath(dia.tree_view.currentIndex())
+                fileName = self.dialog.fileName(file)
+                fromPath = self.dialog.filePath(file)
+                toPath = f"{selected_directory}/{fileName}"
+                quest = f"Переместить {fileName} из {fromPath} в {toPath}"
+                willMove = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
+                if willMove == QMessageBox.StandardButton.Yes:
+                    self.move_file(fromPath, toPath)
 
     # render new rootindex
     def render_new_root(self, dir):
-        self.filePath.setText(f"Current: {dir}")
+        self.filePath.setText(f"{dir}")
         self.tree.setRootIndex(self.dialog.index(dir))
         self.currentDir = dir
         self.update_move_btn()
@@ -300,8 +315,8 @@ class StartWindow(QMainWindow, Ui_MainWindow):
 
     def about(self):
         dialog = QMessageBox()
-        dialog.setText('''About\n\nThis is my college project\nBasic file explorer''')
-        dialog.setWindowTitle("About")
+        dialog.setText('''О Программе\n\nНастоящий проекта был разработан по заказу предодователей ВятГу\nПроект: Файловый Менеджер''')
+        dialog.setWindowTitle("О программе")
         dialog.setIcon(QMessageBox.Icon.Information)
         dialog.exec()
 
@@ -317,63 +332,47 @@ class FolderSelectorDialog(QDialog):
     def __init__(self):
         super(FolderSelectorDialog, self).__init__()
 
-        # Set up the UI components
-        self.init_ui()
-
-    def init_ui(self):
-        # Create a layout
         layout = QVBoxLayout()
 
-        # Create a QLineEdit to display the selected folder name
+        self.setWindowTitle("Выбор папки")
+
         self.folder_name_line_edit = QLineEdit()
         self.folder_name_line_edit.setReadOnly(True)
         layout.addWidget(self.folder_name_line_edit)
 
-        # Create a QTreeView
         self.tree_view = QTreeView()
         layout.addWidget(self.tree_view)
 
-        # Create a QFileSystemModel
         self.model = QFileSystemModel()
-        self.model.setRootPath(QDir.rootPath())  # You can set any initial root path here
-        self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)  # Show only directories
+        self.model.setRootPath(QDir.rootPath())
+        self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
         self.tree_view.setModel(self.model)
 
-        # Set the root index of the tree view to the root path
-        root_index = self.model.index(QDir.rootPath())
-
-        # Set up the buttons
-        ok_button = QPushButton("OK")
+        ok_button = QPushButton("Ок")
         ok_button.clicked.connect(self.accept)
-        cancel_button = QPushButton("Cancel")
+        cancel_button = QPushButton("Отмена")
         cancel_button.clicked.connect(self.reject)
 
-        # Add buttons to the layout
         layout.addWidget(ok_button)
         layout.addWidget(cancel_button)
 
-        # Set the layout for the dialog
         self.setLayout(layout)
 
-        # Connect item selection signal to custom slot
         self.tree_view.selectionModel().selectionChanged.connect(self.handle_selection_change)
 
     def handle_selection_change(self, selected, deselected):
-            # Enable OK button only if an item is selected and it is a directory
             selected_indexes = selected.indexes()
             if selected_indexes:
                 current_index = selected_indexes[0]
                 selected_directory = self.model.filePath(current_index)
                 self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
 
-                # Update the QLineEdit with the selected folder name
                 self.folder_name_line_edit.setText(selected_directory)
             else:
                 self.setEnabled_ok_button(False)
                 self.folder_name_line_edit.clear()
 
     def setEnabled_ok_button(self, enabled):
-        # Enable or disable the OK button
-        ok_button = self.layout().itemAt(1).widget()  # Assumes OK button is the second item in layout
+        ok_button = self.layout().itemAt(1).widget()
         ok_button.setEnabled(enabled)
 
