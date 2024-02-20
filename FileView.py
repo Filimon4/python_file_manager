@@ -5,17 +5,32 @@ class FileView(QWidget):
     def __init__(self, app):
         super().__init__()
 
+        self.app = app
+
+        self.last_move = []
+        self.next_move = []
+
         self.tree_ui = self.app.ui.treeView
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
-        self.tree.setModel(self.dialog)
-        self.tree.setRootIndex(self.dialog.index(self.currentDir))
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        self.app.engine.currentDir = QDir.root().dirName()
+        self.tree.setModel(self.app.FileS.engine)
+        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.FileS.currentDir))
+
+        self.app.FileS.engine.currentDir = QDir.root().dirName()
 
         self.tree.doubleClicked.connect(self.treeClicked)
+
+        self.redo_btn = self.app.ui.redo_btn
+        self.undo_btn = self.app.ui.undo_btn
+        self.levelUp_btn = self.app.ui.up_btn
+        self.update_move_btn()
+
+        self.redo_btn.clicked.connect(self.redo)
+        self.undo_btn.clicked.connect(self.undo)
+        self.levelUp_btn.clicked.connect(self.parent)
 
     @property
     def rootIndex(self):
@@ -83,10 +98,26 @@ class FileView(QWidget):
         # self.render_new_root(next)
         self.app.rendeRoot_Signal.emit(next)
 
-    def resizeEvent(self, event):
-        self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
+    def update_move_btn(self):
+        len_next = len(self.next_move)
+        len_last = len(self.last_move)
 
-    def showEvent(self, event):
+        if (len_next == 0):
+            self.redo_btn.setEnabled(False)
+        else:
+            self.redo_btn.setEnabled(True)
+
+        if (len_last == 0):
+            self.undo_btn.setEnabled(False)
+        else:
+            self.undo_btn.setEnabled(True)
+
+        if (self.app.currentDir == ''):
+            self.levelUp_btn.setEnabled(False)
+        else:
+            self.levelUp_btn.setEnabled(True)
+
+    def resizeEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 
     def treeClicked(self, index):
