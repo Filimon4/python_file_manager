@@ -1,9 +1,12 @@
 {
     "files": [
-        "FileView.py",
+        "FileSystem.py",
+        "FileOperations.py",
         "icons.qrc",
         "main.py",
         "mainwindow.ui",
-        "startWindow.py"
+        "startWindow.py",
+        "FileView.py",
+        "FolderSelectorDialog.py"
     ]
 }
