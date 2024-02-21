@@ -17,9 +17,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QToolBar, QTreeView,
-    QVBoxLayout, QWidget)
+    QLineEdit, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QToolBar,
+    QTreeView, QVBoxLayout, QWidget)
 import rc_icons
 
 class Ui_MainWindow(object):
@@ -166,7 +166,7 @@ class Ui_MainWindow(object):
         self.directory.setObjectName(u"directory")
         self.directory.setAutoFillBackground(False)
         self.directory.setStyleSheet(u"border: 1px solid black;\n"
-"border-radius: 10px;\n"
+"border-radius: 5px;\n"
 "\n"
 "\n"
 "")
@@ -174,10 +174,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.directory)
 
-        self.find = QLabel(self.centralwidget)
+        self.find = QLineEdit(self.centralwidget)
         self.find.setObjectName(u"find")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.find.sizePolicy().hasHeightForWidth())
+        self.find.setSizePolicy(sizePolicy2)
         self.find.setStyleSheet(u"border: 1px solid black;\n"
-"border-radius: 10px;\n"
+"border-radius: 5px;\n"
 "")
 
         self.horizontalLayout_2.addWidget(self.find)
@@ -186,7 +191,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setStretch(1, 1)
         self.horizontalLayout_2.setStretch(2, 1)
         self.horizontalLayout_2.setStretch(3, 8)
-        self.horizontalLayout_2.setStretch(4, 4)
+        self.horizontalLayout_2.setStretch(4, 3)
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
@@ -268,7 +273,6 @@ class Ui_MainWindow(object):
         self.undo_btn.setText("")
         self.redo_btn.setText("")
         self.directory.setText("")
-        self.find.setText("")
         self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", u"\u041f\u0440\u0430\u0432\u043a\u0430", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"\u0424\u0430\u0439\u043b", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043c\u043e\u0449\u044c", None))

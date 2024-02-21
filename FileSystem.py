@@ -4,7 +4,6 @@ from PySide6.QtCore import QDir
 class FileSystem():
     def __init__(self, app):
         self.app = app
-        print(self.app)
 
         self.currentDir = ''
         self.savedFiles = []

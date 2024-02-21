@@ -7,59 +7,62 @@ from PySide6.QtCore import QDir, QFile
 class FileOperations:
 
     @staticmethod
-    def newFolder(self):
+    def newFolder(self, currentDir):
         folderName, ok = QInputDialog.getText(self, "Ввод", "Название папки: ", QLineEdit.Normal)
         if ok:
-            QDir(self.currentDir).mkdir(f"{folderName}")
+            QDir(currentDir).mkdir(f"{folderName}")
 
     @staticmethod
-    def newFile(self):
+    def newFile(self, currentDir):
         fileName, ok = QInputDialog.getText(self, "Ввод", "Название файла: ", QLineEdit.Normal)
-        file = f"{self.currentDir}/{fileName}"
+        file = f"{currentDir}/{fileName}"
         if ok:
             with open(file, "w") as file:
                 pass
 
     @staticmethod
     def delete(self, items = []):
-        indexes = self.getSelectedFiles()
         if items:
-            indexes = items
-        print(indexes)
-        if len(indexes) > 0:
-            quest = f"Удалить {len(indexes)} элементов"
+            quest = f"Удалить {len(items)} элементов"
             willDelete = QMessageBox.question(self, "Удаление", quest, QMessageBox.Yes|QMessageBox.No)
             if willDelete == QMessageBox.StandardButton.Yes:
-                for index in indexes:
+                for index in items:
+                    print(index)
+                    # change
+                    #os.rmtree(<dir_path>)
                     self.dialog.remove(index)
 
     @staticmethod
-    def delete_cut_items(self, items = []):
-        print(items)
-        for index in items:
-            self.dialog.remove(index)
+    def delete_no_sub(self, items = []):
+        if items:
+            for index in items:
+                print(index)
+                #change
+                #os.rmtree(<dir_path>)
+                self.dialog.remove(index)
 
     @staticmethod
-    def cut(self):
-        # get selected files
-        files = self.savedFiles
-        if files:
-            quest = f"Вырезать {len(files)} элементов"
+    def cut(self, savedFiles):
+        if savedFiles:
+            quest = f"Вырезать {len(savedFiles)} элементов"
             willDelete = QMessageBox.question(self, "Вырезание", quest, QMessageBox.Yes|QMessageBox.No)
             if willDelete == QMessageBox.StandardButton.Yes:
-                self.paste()
-                self.delete_cut_items(files)
+                FileOperations.paste(savedFiles)
+                FileOperations.delete_no_sub(savedFiles)
 
     @staticmethod
-    def paste(self):
-        willPaste = QMessageBox.question(self, "Вставка", "Вставить файлы в настоящую директорию", QMessageBox.Yes|QMessageBox.No)
-        if not willPaste == QMessageBox.StandardButton.Yes:
-            return
-        for file in self.savedFiles:
+    def paste(self, savedFiles):
+        willPaste = QMessageBox.question(self, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
+        if not willPaste == QMessageBox.StandardButton.Yes: return
+
+        for file in savedFiles:
+            #change
+            # os.path.isDir(<dir_path>)
             if self.dialog.fileInfo(file).isDir():
+                # os.path.dirname, os.path.basename
+                # file_path, file_name = os.psth.split(<path>) "D:/Projects/test, test.txt"
                 filePath = self.dialog.filePath(file)
                 fileName = self.dialog.fileName(file)
-
 
                 files = os.listdir(self.currentDir)
 

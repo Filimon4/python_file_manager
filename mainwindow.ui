@@ -64,7 +64,7 @@ QPushButton:pressed {
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,8,4">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,8,3">
       <item>
        <widget class="QPushButton" name="undo_btn">
         <property name="sizePolicy">
@@ -141,7 +141,7 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid black;
-border-radius: 10px;
+border-radius: 5px;
 
 
 </string>
@@ -155,14 +155,17 @@ border-radius: 10px;
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="find">
+       <widget class="QLineEdit" name="find">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid black;
-border-radius: 10px;
+border-radius: 5px;
 </string>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
       </item>

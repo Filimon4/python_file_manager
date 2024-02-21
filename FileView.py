@@ -17,9 +17,7 @@ class FileView(QWidget):
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.tree.setModel(self.app.FileS.engine)
-        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.FileS.currentDir))
-
-        self.app.FileS.engine.currentDir = QDir.root().dirName()
+        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
 
         self.tree.doubleClicked.connect(self.treeClicked)
 
@@ -31,6 +29,8 @@ class FileView(QWidget):
         self.redo_btn.clicked.connect(self.redo)
         self.undo_btn.clicked.connect(self.undo)
         self.levelUp_btn.clicked.connect(self.parent)
+
+        print("rootIndex: ", self.tree.rootIndex())
 
     @property
     def rootIndex(self):
@@ -60,27 +60,28 @@ class FileView(QWidget):
             return None
 
     def parent(self):
-        dirs = self.currentDir.split('/')
+        dirs = self.app.currentDir.split('/')
 
         if (len(dirs) == 1):
             self.render_new_root('')
         else:
             path = '/'.join(dirs[0:len(dirs)-1])
-            # self.render_new_root(path)
+            # self.app.render_new_root(path)
             self.app.rendeRoot_Signal.emit(path)
 
 
     def undo (self):
         if (len(self.last_move) == 0): return
         last = self.last_move.pop(0)
-        if (last is self.currentDir):
-            if (not (self.currentDir in self.last_move) and not(self.currentDir in self.next_move)):
-                self.next_move.insert(0, self.currentDir)
+        currentDir = self.app.currentDir
+        if (last is currentDir):
+            if (not (currentDir in self.last_move) and not(currentDir in self.next_move)):
+                self.next_move.insert(0, currentDir)
             if (not (last in self.next_move)):
                 self.next_move.insert(0, last)
             last = self.last_move.pop(0)
-        if (not (self.currentDir in self.last_move) and not(self.currentDir in self.next_move)):
-            self.next_move.insert(0, self.currentDir)
+        if (not (currentDir in self.last_move) and not(currentDir in self.next_move)):
+            self.next_move.insert(0, currentDir)
         if (not (last in self.next_move)):
             self.next_move.insert(0, last)
         # self.render_new_root(last)
@@ -89,7 +90,8 @@ class FileView(QWidget):
     def redo (self):
         if (len(self.next_move) == 0): return
         next = self.next_move.pop(0)
-        if (next is self.currentDir):
+        currentDir = self.app.currentDir
+        if (next is currentDir):
             if (not (next in self.last_move)):
                 self.last_move.insert(0, next)
             next = self.next_move.pop(0)
@@ -122,7 +124,3 @@ class FileView(QWidget):
 
     def treeClicked(self, index):
         self.app.treeClicked_Signal.emit(index)
-        # file = self.engine.filePath(index)
-        # self.filePath.setText(f"{file}")
-        # self.last_move.insert(0, self.currentDir)
-        # self.render_new_root(file)
