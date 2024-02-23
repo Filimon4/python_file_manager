@@ -6,65 +6,62 @@ from PySide6.QtCore import QDir, QFile
 
 class FileOperations:
 
-    @staticmethod
-    def newFolder(self, currentDir):
-        folderName, ok = QInputDialog.getText(self, "Ввод", "Название папки: ", QLineEdit.Normal)
-        if ok:
-            QDir(currentDir).mkdir(f"{folderName}")
+    def __init__(self, app):
+        self.app = app
+        self.cut_files = False
 
-    @staticmethod
-    def newFile(self, currentDir):
-        fileName, ok = QInputDialog.getText(self, "Ввод", "Название файла: ", QLineEdit.Normal)
-        file = f"{currentDir}/{fileName}"
+    def newFolder(self):
+        folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal)
+        if ok:
+            QDir(self.app.currentDir).mkdir(f"{folderName}")
+
+    def newFile(self):
+        fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal)
+        file = f"{self.app.currentDir}/{fileName}"
         if ok:
             with open(file, "w") as file:
                 pass
 
-    @staticmethod
     def delete(self, items = []):
+        if not items:
+            items = self.app.FileV.getSelectedFiles()
         if items:
             quest = f"Удалить {len(items)} элементов"
-            willDelete = QMessageBox.question(self, "Удаление", quest, QMessageBox.Yes|QMessageBox.No)
+            willDelete = QMessageBox.question(self.app, "Удаление", quest, QMessageBox.Yes|QMessageBox.No)
             if willDelete == QMessageBox.StandardButton.Yes:
                 for index in items:
-                    print(index)
-                    # change
-                    #os.rmtree(<dir_path>)
-                    self.dialog.remove(index)
+                    self.app.FileS.engine.remove(index)
 
-    @staticmethod
-    def delete_no_sub(self, items = []):
+    def delete_no_sub(self, items = [], saved=False):
+        if saved:
+            items = self.app.savedFiles
         if items:
             for index in items:
-                print(index)
-                #change
-                #os.rmtree(<dir_path>)
-                self.dialog.remove(index)
+                self.app.FileS.engine.remove(index)
 
-    @staticmethod
-    def cut(self, savedFiles):
-        if savedFiles:
-            quest = f"Вырезать {len(savedFiles)} элементов"
-            willDelete = QMessageBox.question(self, "Вырезание", quest, QMessageBox.Yes|QMessageBox.No)
-            if willDelete == QMessageBox.StandardButton.Yes:
-                FileOperations.paste(savedFiles)
-                FileOperations.delete_no_sub(savedFiles)
+    def copy(self):
+        files = self.app.FileV.getSelectedFiles()
+        if files:
+            self.cut_files = False
+            self.app.setSavedFiles_Signal.emit(files)
 
-    @staticmethod
-    def paste(self, savedFiles):
-        willPaste = QMessageBox.question(self, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
+    def cut(self):
+        files = self.app.FileV.getSelectedFiles()
+        if files:
+            self.cut_files = True
+            self.app.setSavedFiles_Signal.emit(files)
+
+    def paste(self):
+        willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
         if not willPaste == QMessageBox.StandardButton.Yes: return
 
-        for file in savedFiles:
-            #change
-            # os.path.isDir(<dir_path>)
-            if self.dialog.fileInfo(file).isDir():
-                # os.path.dirname, os.path.basename
-                # file_path, file_name = os.psth.split(<path>) "D:/Projects/test, test.txt"
-                filePath = self.dialog.filePath(file)
-                fileName = self.dialog.fileName(file)
+        for file in self.app.savedFiles:
+            if self.app.FileS.engine.fileInfo(file).isDir():
+                filePath = self.app.FileS.engine.filePath(file)
+                fileName = self.app.FileS.engine.fileName(file)
 
-                files = os.listdir(self.currentDir)
+                files = os.listdir(self.app.currentDir)
+                print(QDir(self.app.currentDir))
 
                 if os.path.isdir(filePath):
                     counter = 0
@@ -72,29 +69,22 @@ class FileOperations:
                         if f.startswith(fileName):
                             counter += 1
                             print(f, counter)
-                    if counter == 0 or counter == 1:
-                        shutil.copytree(filePath, f"{self.currentDir}/{fileName} - copy")
-                    else:
-                        shutil.copytree(filePath, f"{self.currentDir}/{fileName} - copy ({counter})")
+                    shutil.copytree(filePath, f"{self.currentDir}/{fileName} ({counter})")
                 else:
                     shutil.copytree(filePath, f"{self.currentDir}/{fileName}")
-            elif self.dialog.fileInfo(file).isFile():
-                filePath = self.dialog.filePath(file)
-                fileName = self.dialog.fileName(file)
-                shutil.copy2(filePath, f"{self.currentDir}/{fileName}")
+            elif self.app.FileS.engine.fileInfo(file).isFile():
+                filePath = self.app.FileS.engine.filePath(file)
+                fileName = self.app.FileS.engine.fileName(file)
+                shutil.copy2(filePath, f"{self.app.currentDir}/{fileName}")
 
-    @staticmethod
-    def copy(self):
-        files = self.getSelectedFiles()
-        self.savedFiles = files
+        if self.cut_files == True:
+            self.delete_no_sub(saved=True)
 
-    @staticmethod
     def move_file(self, fromPath, toPath):
         if fromPath and toPath:
             shutil.move(fromPath, toPath)
 
-    @staticmethod
-    def move (self):
+    def move(self):
         file = self.getSingleSelectedFile()
         if file:
             dia = FolderSelectorDialog()
@@ -110,7 +100,6 @@ class FileOperations:
                 if willMove == QMessageBox.StandardButton.Yes:
                     self.move_file(fromPath, toPath)
 
-    @staticmethod
     def rename (self):
         file = self.getSingleSelectedFile()
         if file:

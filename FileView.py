@@ -40,18 +40,16 @@ class FileView(QWidget):
     def rootIndex(self, index):
         self.tree.setRootIndex(index)
 
-    @property
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()
         uniqueFiles = []
         for file in files:
-            path = self.dialog.filePath(file)
+            path = self.app.FileS.engine.filePath(file)
             if not path in uniqueFiles:
                 uniqueFiles.append(path)
-        uniqueFiles = [self.dialog.index(x) for x in uniqueFiles]
+        uniqueFiles = [self.app.FileS.engine.index(x) for x in uniqueFiles]
         return uniqueFiles
 
-    @property
     def getSingleSelectedFile(self):
         files = self.getSelectedFiles()
         if len(files) == 1:
@@ -63,10 +61,9 @@ class FileView(QWidget):
         dirs = self.app.currentDir.split('/')
 
         if (len(dirs) == 1):
-            self.render_new_root('')
+            self.app.rendeRoot_Signal.emit('')
         else:
             path = '/'.join(dirs[0:len(dirs)-1])
-            # self.app.render_new_root(path)
             self.app.rendeRoot_Signal.emit(path)
 
 
@@ -84,7 +81,6 @@ class FileView(QWidget):
             self.next_move.insert(0, currentDir)
         if (not (last in self.next_move)):
             self.next_move.insert(0, last)
-        # self.render_new_root(last)
         self.app.rendeRoot_Signal.emit(last)
 
     def redo (self):
@@ -97,7 +93,6 @@ class FileView(QWidget):
             next = self.next_move.pop(0)
         if (not (next in self.last_move)):
             self.last_move.insert(0, next)
-        # self.render_new_root(next)
         self.app.rendeRoot_Signal.emit(next)
 
     def update_move_btn(self):
