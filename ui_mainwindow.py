@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QToolBar,
-    QTreeView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QToolBar, QTreeView, QVBoxLayout, QWidget)
 import rc_icons
 
 class Ui_MainWindow(object):
@@ -117,12 +117,16 @@ class Ui_MainWindow(object):
         icon9 = QIcon()
         icon9.addFile(u":/imgs_file_manager/move-to-folder.png", QSize(), QIcon.Normal, QIcon.Off)
         self.actionMove.setIcon(icon9)
+        self.actionCipher = QAction(MainWindow)
+        self.actionCipher.setObjectName(u"actionCipher")
+        self.actionDecipher = QAction(MainWindow)
+        self.actionDecipher.setObjectName(u"actionDecipher")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
         self.centralwidget.setSizePolicy(sizePolicy)
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.gridLayout = QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.undo_btn = QPushButton(self.centralwidget)
@@ -193,7 +197,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setStretch(3, 8)
         self.horizontalLayout_2.setStretch(4, 3)
 
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.gridLayout.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
+
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setSpacing(4)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.driverView = QHBoxLayout()
+        self.driverView.setSpacing(5)
+        self.driverView.setObjectName(u"driverView")
+
+        self.verticalLayout_2.addLayout(self.driverView)
 
         self.treeView = QTreeView(self.centralwidget)
         self.treeView.setObjectName(u"treeView")
@@ -203,7 +216,12 @@ class Ui_MainWindow(object):
         self.treeView.setMinimumSize(QSize(1, 0))
         self.treeView.setMaximumSize(QSize(1000000, 100000))
 
-        self.verticalLayout.addWidget(self.treeView)
+        self.verticalLayout_2.addWidget(self.treeView)
+
+        self.verticalLayout_2.setStretch(0, 1)
+        self.verticalLayout_2.setStretch(1, 20)
+
+        self.gridLayout.addLayout(self.verticalLayout_2, 1, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -235,6 +253,9 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionMake_folder)
         self.menuFile.addAction(self.actionNew_File)
         self.menuFile.addAction(self.actionDelete_folder)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionCipher)
+        self.menuFile.addAction(self.actionDecipher)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionAbout_Qt)
         self.toolBar.addAction(self.actionCopy)
@@ -270,6 +291,8 @@ class Ui_MainWindow(object):
         self.actionDelete_folder.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0435\u043d\u0438\u0435", None))
         self.actionNew_File.setText(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u0432\u044b\u0439 \u0444\u0430\u0439\u043b", None))
         self.actionMove.setText(QCoreApplication.translate("MainWindow", u"\u041f\u0435\u0440\u0435\u043c\u0435\u0449\u0435\u043d\u0438\u0435", None))
+        self.actionCipher.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u0448\u0438\u0444\u0440\u043e\u0432\u0430\u0442\u044c", None))
+        self.actionDecipher.setText(QCoreApplication.translate("MainWindow", u"\u0414\u0435\u0448\u0438\u0444\u0440\u043e\u0432\u0430\u0442\u044c", None))
         self.undo_btn.setText("")
         self.redo_btn.setText("")
         self.directory.setText("")

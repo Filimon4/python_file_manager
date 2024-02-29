@@ -1,18 +1,12 @@
-import shutil
 import os
 
 from PySide6.QtWidgets import (
-    QPushButton, QAbstractItemView, QApplication,
-    QMessageBox, QDialog, QLineEdit, QInputDialog, QMainWindow,
-    QFileSystemModel, QListView, QTreeView,
-    QVBoxLayout
+    QMainWindow,
 )
 from PySide6.QtCore import (
-    QFileInfo, QDir, QSize,
-    QFile, Signal, Slot, QSettings
+    QSize, Signal, Slot, QSettings
 )
 from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent
-from FolderSelectorDialog import FolderSelectorDialog
 from ui_mainwindow import Ui_MainWindow
 
 # Maim logic modules
@@ -105,9 +99,10 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     @Slot(QMouseEvent)
     def treeClicked(self, index):
         file = self.FileS.engine.filePath(index)
-        self.filePath.setText(f"{file}")
-        self.FileV.last_move.insert(0, self.currentDir)
-        self.renderNewRoot(file)
+        if os.path.isdir(file):
+            self.filePath.setText(f"{file}")
+            self.FileV.last_move.insert(0, self.currentDir)
+            self.renderNewRoot(file)
 
     @Slot(str)
     def renderNewRoot(self, dir):

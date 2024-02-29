@@ -7,6 +7,7 @@
         "mainwindow.ui",
         "startWindow.py",
         "FileView.py",
-        "FolderSelectorDialog.py"
+        "FolderSelectorDialog.py",
+        "CipherAlgo.py"
     ]
 }

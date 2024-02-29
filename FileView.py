@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QListView, QAbstractItemView
+from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
 from PySide6.QtCore import QSize, QDir
 
 class FileView(QWidget):
@@ -11,6 +11,19 @@ class FileView(QWidget):
         self.next_move = []
 
         self.tree_ui = self.app.ui.treeView
+
+        #disks
+        self.logicDisks = QDir.drives()
+        self.driverView = self.app.ui.driverView
+        for disk in self.logicDisks:
+            button = QPushButton()
+            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            button.setMaximumHeight(25)
+            button.setMaximumWidth(35)
+            button.setText(disk.absolutePath())
+            self.driverView.addWidget(button)
+        self.driverView.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))

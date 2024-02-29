@@ -69,9 +69,9 @@ class FileOperations:
                         if f.startswith(fileName):
                             counter += 1
                             print(f, counter)
-                    shutil.copytree(filePath, f"{self.currentDir}/{fileName} ({counter})")
+                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
                 else:
-                    shutil.copytree(filePath, f"{self.currentDir}/{fileName}")
+                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName}")
             elif self.app.FileS.engine.fileInfo(file).isFile():
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
@@ -85,18 +85,18 @@ class FileOperations:
             shutil.move(fromPath, toPath)
 
     def move(self):
-        file = self.getSingleSelectedFile()
+        file = self.app.FileV.getSingleSelectedFile()
         if file:
             dia = FolderSelectorDialog()
             result = dia.exec_()
 
             if result == QDialog.Accepted:
-                selected_directory = self.dialog.filePath(dia.tree_view.currentIndex())
-                fileName = self.dialog.fileName(file)
-                fromPath = self.dialog.filePath(file)
+                selected_directory = self.app.FileS.engine.filePath(dia.tree_view.currentIndex())
+                fileName = self.app.FileS.engine.fileName(file)
+                fromPath = self.app.FileS.engine.filePath(file)
                 toPath = f"{selected_directory}/{fileName}"
                 quest = f"Переместить {fileName} из {fromPath} в {toPath}"
-                willMove = QMessageBox.question(self, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
+                willMove = QMessageBox.question(self.app, "Move item", quest, QMessageBox.Yes|QMessageBox.No)
                 if willMove == QMessageBox.StandardButton.Yes:
                     self.move_file(fromPath, toPath)
 
@@ -106,7 +106,7 @@ class FileOperations:
             itemPath = self.dialog.filePath(file)
             item = QFile(itemPath)
             fileName, ok = QInputDialog.getText(self, "Ввод", "Новое имя: ", QLineEdit.Normal)
-            filePath = f"{self.currentDir}/{fileName}"
+            filePath = f"{self.app.currentDir}/{fileName}"
             if item.rename(filePath):
                 print("New file name")
             else:

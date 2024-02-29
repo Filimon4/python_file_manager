@@ -62,8 +62,8 @@ QPushButton:pressed {
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,1,8,3">
       <item>
        <widget class="QPushButton" name="undo_btn">
@@ -171,30 +171,44 @@ border-radius: 5px;
       </item>
      </layout>
     </item>
-    <item>
-     <widget class="QTreeView" name="treeView">
-      <property name="enabled">
-       <bool>true</bool>
+    <item row="1" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,20">
+      <property name="spacing">
+       <number>4</number>
       </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>1</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>1000000</width>
-        <height>100000</height>
-       </size>
-      </property>
-     </widget>
+      <item>
+       <layout class="QHBoxLayout" name="driverView">
+        <property name="spacing">
+         <number>5</number>
+        </property>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTreeView" name="treeView">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>1</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1000000</width>
+          <height>100000</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -225,6 +239,9 @@ border-radius: 5px;
     <addaction name="actionMake_folder"/>
     <addaction name="actionNew_File"/>
     <addaction name="actionDelete_folder"/>
+    <addaction name="separator"/>
+    <addaction name="actionCipher"/>
+    <addaction name="actionDecipher"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -360,6 +377,16 @@ border-radius: 5px;
    </property>
    <property name="text">
     <string>Перемещение</string>
+   </property>
+  </action>
+  <action name="actionCipher">
+   <property name="text">
+    <string>Зашифровать</string>
+   </property>
+  </action>
+  <action name="actionDecipher">
+   <property name="text">
+    <string>Дешифровать</string>
    </property>
   </action>
  </widget>
