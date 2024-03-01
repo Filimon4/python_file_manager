@@ -13,6 +13,7 @@ from ui_mainwindow import Ui_MainWindow
 from FileOperations import FileOperations
 from FileSystem import FileSystem
 from FileView import FileView
+from CipherAlgo import Encrypt, Decrypt
 # -- -- -- --
 
 SETTINGS_NAME = "FileExplorer"
@@ -84,6 +85,8 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.FileS = FileSystem(self)
         self.FileV = FileView(self)
         self.FileO = FileOperations(self)
+        self.Encrpt = Encrypt(self)
+        self.Decrpt = Decrypt(self)
 
         self.actions = ActionsApp(self)
 

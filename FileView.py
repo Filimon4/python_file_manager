@@ -1,6 +1,16 @@
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
 from PySide6.QtCore import QSize, QDir
 
+# class DiskButton:
+#     def __init__(self, app):
+#         pass
+
+# class Disks:
+#     def __init__(self, app):
+#         self.logicDisks = QDir.drives()
+#         self.driverView = self.app.ui.driverView
+
+
 class FileView(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -23,7 +33,6 @@ class FileView(QWidget):
             button.setText(disk.absolutePath())
             self.driverView.addWidget(button)
         self.driverView.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))

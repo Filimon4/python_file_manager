@@ -10,6 +10,12 @@ class FileOperations:
         self.app = app
         self.cut_files = False
 
+    def readBinaryFile(self):
+        pass
+
+    def newFileFromBinary(self):
+        pass
+
     def newFolder(self):
         folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal)
         if ok:
