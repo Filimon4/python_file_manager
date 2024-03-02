@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import (
     QSize, Signal, Slot, QSettings
 )
-from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent
+from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent, QIcon
 from ui_mainwindow import Ui_MainWindow
 
 # Maim logic modules
@@ -58,6 +58,9 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     setSavedFiles_Signal = Signal((list))
     def __init__(self):
         super().__init__()
+
+        app_icon = QIcon('app_icon.png')
+        self.setWindowIcon(app_icon)
 
         self.currentDir = ""
         self.savedFiles = []
