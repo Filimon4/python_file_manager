@@ -12,7 +12,7 @@ from ui_mainwindow import Ui_MainWindow
 # Maim logic modules
 from FileOperations import FileOperations
 from FileSystem import FileSystem
-from FileView import FileView
+from FileView import FileView, Disks
 from CipherAlgo import Encrypt, Decrypt
 # -- -- -- --
 
@@ -90,6 +90,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.FileO = FileOperations(self)
         self.Encrpt = Encrypt(self)
         self.Decrpt = Decrypt(self)
+        self.Disks = Disks(self)
 
         self.actions = ActionsApp(self)
 

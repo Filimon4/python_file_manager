@@ -1,14 +1,35 @@
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
 from PySide6.QtCore import QSize, QDir
 
-# class DiskButton:
-#     def __init__(self, app):
-#         pass
+class DiskButton(QPushButton):
+    def __init__(self, disks, path):
+        super().__init__()
+        self.disks = disks
+        self.path = path
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setMaximumHeight(25)
+        self.setMaximumWidth(35)
+        self.setText(self.path)
+        self.clicked.connect(self.buttonClicked)
 
-# class Disks:
-#     def __init__(self, app):
-#         self.logicDisks = QDir.drives()
-#         self.driverView = self.app.ui.driverView
+    def buttonClicked(self):
+        self.disks.navigateToDisk(self.path)
+
+
+
+class Disks:
+    def __init__(self, app):
+        self.app = app
+        self.logicDisks = QDir.drives()
+        self.driverView = self.app.ui.driverView
+
+        for disk in self.logicDisks:
+            button = DiskButton(self, disk.absolutePath())
+            self.driverView.addWidget(button)
+        self.driverView.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+    def navigateToDisk(self, path):
+        self.app.rendeRoot_Signal.emit(path)
 
 
 class FileView(QWidget):
@@ -21,18 +42,6 @@ class FileView(QWidget):
         self.next_move = []
 
         self.tree_ui = self.app.ui.treeView
-
-        #disks
-        self.logicDisks = QDir.drives()
-        self.driverView = self.app.ui.driverView
-        for disk in self.logicDisks:
-            button = QPushButton()
-            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            button.setMaximumHeight(25)
-            button.setMaximumWidth(35)
-            button.setText(disk.absolutePath())
-            self.driverView.addWidget(button)
-        self.driverView.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
@@ -82,7 +91,7 @@ class FileView(QWidget):
     def parent(self):
         dirs = self.app.currentDir.split('/')
 
-        if (len(dirs) == 1):
+        if not (QDir(self.app.currentDir).cdUp()):
             self.app.rendeRoot_Signal.emit('')
         else:
             path = '/'.join(dirs[0:len(dirs)-1])
