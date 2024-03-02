@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
-from PySide6.QtCore import QSize, QDir
+from PySide6.QtCore import QSize, QDir, Qt, QSortFilterProxyModel, QRegularExpression
 
 class DiskButton(QPushButton):
     def __init__(self, disks, path):
@@ -47,8 +47,15 @@ class FileView(QWidget):
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        self.tree.setModel(self.app.FileS.engine)
-        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
+
+        self.proxyModel = QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(self.app.FileS.engine)
+        self.proxyModel.setFilterRegularExpression(QRegularExpression(''))
+
+        self.tree.setModel(self.proxyModel)
+        self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
+        # self.tree.setModel(self.app.FileS.engine)
+        # self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
 
         self.tree.doubleClicked.connect(self.treeClicked)
 
@@ -61,15 +68,14 @@ class FileView(QWidget):
         self.undo_btn.clicked.connect(self.undo)
         self.levelUp_btn.clicked.connect(self.parent)
 
-        print("rootIndex: ", self.tree.rootIndex())
-
     @property
     def rootIndex(self):
         return self.tree.rootIndex()
 
     @rootIndex.setter
     def rootIndex(self, index):
-        self.tree.setRootIndex(index)
+        print(index)
+        self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
 
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()
@@ -150,3 +156,4 @@ class FileView(QWidget):
 
     def treeClicked(self, index):
         self.app.treeClicked_Signal.emit(index)
+
