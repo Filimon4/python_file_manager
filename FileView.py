@@ -15,8 +15,6 @@ class DiskButton(QPushButton):
     def buttonClicked(self):
         self.disks.navigateToDisk(self.path)
 
-
-
 class Disks:
     def __init__(self, app):
         self.app = app
@@ -31,6 +29,25 @@ class Disks:
     def navigateToDisk(self, path):
         self.app.rendeRoot_Signal.emit(path)
 
+class CustomSortFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        self.setSourceModel(model)
+        self.setFilterRegularExpression(QRegularExpression(''))
+
+    def setCustomFilter(self, regex):
+        self.setFilterRegularExpression(regex)
+
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        print(f"SourceRow: {sourceRow}")
+        print(f"SourceParent {sourceParent}")
+        sourceIndex = self.model.index(sourceRow, 0, sourceParent)
+        print(f"SourceIndex: {sourceIndex}")
+        data = self.model.data(sourceIndex)
+        print(f"Data: {data}")
+
+        return True
 
 class FileView(QWidget):
     def __init__(self, app):
@@ -42,20 +59,19 @@ class FileView(QWidget):
         self.next_move = []
 
         self.tree_ui = self.app.ui.treeView
+        self.find_ui = self.app.ui.find
+        self.find_ui.textChanged.connect(self.setRegex)
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
+        # self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
 
-        self.proxyModel = QSortFilterProxyModel()
-        self.proxyModel.setSourceModel(self.app.FileS.engine)
-        self.proxyModel.setFilterRegularExpression(QRegularExpression(''))
-
-        self.tree.setModel(self.proxyModel)
-        self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
-        # self.tree.setModel(self.app.FileS.engine)
-        # self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
+        # self.tree.setModel(self.proxyModel)
+        # self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
+        self.tree.setModel(self.app.FileS.engine)
+        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
 
         self.tree.doubleClicked.connect(self.treeClicked)
 
@@ -74,8 +90,13 @@ class FileView(QWidget):
 
     @rootIndex.setter
     def rootIndex(self, index):
-        print(index)
-        self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
+        # self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
+        self.tree.setRootIndex(index)
+
+    def setRegex(self, text):
+        root = self.rootIndex
+        self.proxyModel.setCustomFilter(QRegularExpression(f'{text}'))
+        self.rootIndex = root
 
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()

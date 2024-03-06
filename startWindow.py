@@ -106,8 +106,8 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     @Slot(QMouseEvent)
     def treeClicked(self, index):
         print(index)
-        # file = self.FileS.engine.filePath(index)
-        file = self.FileS.engine.filePath(self.FileV.proxyModel.mapToSource(index))
+        file = self.FileS.engine.filePath(index)
+        # file = self.FileS.engine.filePath(self.FileV.proxyModel.mapToSource(index))
         print('here')
         if os.path.isdir(file):
             self.filePath.setText(f"{file}")

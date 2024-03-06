@@ -2,8 +2,8 @@ import base64
 from typing import List
 
 class CipherAlgo:
+    defaultKeys = [0xA1B2C3D4, 0xE5F67890, 0x1A2B3C4D, 0x5E6F7890]
     def __init__(self):
-        self.defaultKeys = [0xA1B2C3D4, 0xE5F67890, 0x1A2B3C4D, 0x5E6F7890]
         self.input = ''
         self.output = ''
 
@@ -11,7 +11,7 @@ class CipherAlgo:
         new_right = left ^ key
         return right, new_right
 
-    def feistel_cipher(self, plaintext: bytes, keys: List[int]) -> bytes:
+    def feistel_cipher(self, plaintext: bytes, keys: List[int] = defaultKeys) -> bytes:
         padding_length = 8 - (len(plaintext) % 8)
         plaintext += bytes([padding_length] * padding_length)
 
@@ -33,7 +33,7 @@ class CipherAlgo:
 
         return ciphertext
 
-    def feistel_decipher(self, ciphertext: bytes, keys: List[int]) -> bytes:
+    def feistel_decipher(self, ciphertext: bytes, keys: List[int] = defaultKeys) -> bytes:
         blocks = [ciphertext[i:i+8] for i in range(0, len(ciphertext), 8)]
         plaintext = b''
 
@@ -94,7 +94,11 @@ class Encrypt(CipherAlgo):
         self.actionCipher.triggered.connect(self.actionClicked)
 
     def actionClicked(self):
-        print('cipherStart')
+        selectedFile = self.app.FileV.getSingleSelectedFile()
+        readBinary = self.app.FileO.readBinaryFile(selectedFile)
+        plain_text = base64.b64encode(readBinary)
+        ciphertext = super().feistel_cipher(plain_text)
+        self.app.FileO.newFileBinarySilent("text_cipher.b64", ciphertext)
 
 
 class Decrypt(CipherAlgo):
@@ -106,5 +110,11 @@ class Decrypt(CipherAlgo):
         self.actionDecipher.triggered.connect(self.actionClicked)
 
     def actionClicked(self):
-        print('decipherStart')
+        # // взять зашифрованный файл
+        selectedFile = self.app.FileV.getSingleSelectedFile()
+        readBinary = self.app.FileO.readBinaryFile(selectedFile)
+        # // расшифровать файл
+        deciphertext = super().feistel_decipher(readBinary)
+        # // создать файл с текстом
+        self.app.FileO.newFileBinarySilent("text_cipher_dec.txt", base64.b64decode(deciphertext))
 

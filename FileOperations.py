@@ -10,23 +10,31 @@ class FileOperations:
         self.app = app
         self.cut_files = False
 
-    def readBinaryFile(self):
-        pass
-
-    def newFileFromBinary(self):
-        pass
+    def readBinaryFile(self, file):
+        filePath = self.app.FileS.engine.filePath(file)
+        # fileName = self.app.FileS.engine.fileName(file)
+        ciphertext = ""
+        with open(f"{filePath}", "rb") as file:
+            ciphertext = file.read()
+        return ciphertext
 
     def newFolder(self):
         folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal)
-        if ok:
+        if ok and folderName:
             QDir(self.app.currentDir).mkdir(f"{folderName}")
 
     def newFile(self):
         fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal)
         file = f"{self.app.currentDir}/{fileName}"
-        if ok:
+        if ok and file:
             with open(file, "w") as file:
                 pass
+
+    def newFileBinarySilent(self, fileName, binaryText):
+        file = f"{self.app.currentDir}/{fileName}"
+        if file:
+            with open(file, "wb") as file:
+                file.write(binaryText)
 
     def delete(self, items = []):
         if not items:
