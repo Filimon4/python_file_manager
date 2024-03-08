@@ -95,10 +95,12 @@ class Encrypt(CipherAlgo):
 
     def actionClicked(self):
         selectedFile = self.app.FileV.getSingleSelectedFile()
+        fileName = self.app.FileS.engine.fileName(selectedFile)
+        print(fileName)
         readBinary = self.app.FileO.readBinaryFile(selectedFile)
         plain_text = base64.b64encode(readBinary)
-        ciphertext = super().feistel_cipher(plain_text)
-        self.app.FileO.newFileBinarySilent("text_cipher.b64", ciphertext)
+        ciphertext = str.encode(f"{fileName}") + str.encode("\n") + super().feistel_cipher(plain_text)
+        self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
 
 
 class Decrypt(CipherAlgo):
@@ -110,11 +112,10 @@ class Decrypt(CipherAlgo):
         self.actionDecipher.triggered.connect(self.actionClicked)
 
     def actionClicked(self):
-        # // взять зашифрованный файл
         selectedFile = self.app.FileV.getSingleSelectedFile()
         readBinary = self.app.FileO.readBinaryFile(selectedFile)
-        # // расшифровать файл
-        deciphertext = super().feistel_decipher(readBinary)
-        # // создать файл с текстом
-        self.app.FileO.newFileBinarySilent("text_cipher_dec.txt", base64.b64decode(deciphertext))
+        fileName, cipher = readBinary.split(b'\n')
+        print(fileName, cipher)
+        deciphertext = super().feistel_decipher(cipher)
+        self.app.FileO.newFileBinarySilent(f"{fileName.decode()}", base64.b64decode(deciphertext))
 

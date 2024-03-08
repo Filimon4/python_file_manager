@@ -115,11 +115,11 @@ class FileOperations:
                     self.move_file(fromPath, toPath)
 
     def rename (self):
-        file = self.getSingleSelectedFile()
+        file = self.app.FileV.getSingleSelectedFile()
         if file:
-            itemPath = self.dialog.filePath(file)
+            itemPath = self.app.FileS.engine.filePath(file)
             item = QFile(itemPath)
-            fileName, ok = QInputDialog.getText(self, "Ввод", "Новое имя: ", QLineEdit.Normal)
+            fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal)
             filePath = f"{self.app.currentDir}/{fileName}"
             if item.rename(filePath):
                 print("New file name")
