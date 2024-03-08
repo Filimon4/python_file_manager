@@ -40,12 +40,12 @@ class CustomSortFilterProxyModel(QSortFilterProxyModel):
         self.setFilterRegularExpression(regex)
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
-        print(f"SourceRow: {sourceRow}")
-        print(f"SourceParent {sourceParent}")
+        # print(f"SourceRow: {sourceRow}")
+        # print(f"SourceParent {sourceParent}")
         sourceIndex = self.model.index(sourceRow, 0, sourceParent)
-        print(f"SourceIndex: {sourceIndex}")
+        # print(f"SourceIndex: {sourceIndex}")
         data = self.model.data(sourceIndex)
-        print(f"Data: {data}")
+        # print(f"Data: {data}")
 
         return True
 
@@ -66,12 +66,12 @@ class FileView(QWidget):
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        # self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
+        self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
 
-        # self.tree.setModel(self.proxyModel)
-        # self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
-        self.tree.setModel(self.app.FileS.engine)
-        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
+        self.tree.setModel(self.proxyModel)
+        self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
+        # self.tree.setModel(self.app.FileS.engine)
+        # self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
 
         self.tree.doubleClicked.connect(self.treeClicked)
 
@@ -90,8 +90,8 @@ class FileView(QWidget):
 
     @rootIndex.setter
     def rootIndex(self, index):
-        # self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
-        self.tree.setRootIndex(index)
+        self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
+        # self.tree.setRootIndex(index)
 
     def setRegex(self, text):
         root = self.rootIndex
@@ -102,10 +102,14 @@ class FileView(QWidget):
         files = self.tree.selectionModel().selectedIndexes()
         uniqueFiles = []
         for file in files:
-            path = self.app.FileS.engine.filePath(file)
+            print(file)
+            print(self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file)))
+            path = self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file))
             if not path in uniqueFiles:
                 uniqueFiles.append(path)
         uniqueFiles = [self.app.FileS.engine.index(x) for x in uniqueFiles]
+        print(uniqueFiles[0])
+        print(self.proxyModel.mapFromSource(uniqueFiles[0]))
         return uniqueFiles
 
     def getSingleSelectedFile(self):

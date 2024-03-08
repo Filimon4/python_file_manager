@@ -55,35 +55,6 @@ class CipherAlgo:
 
         return plaintext
 
-    # def cipher(self):
-    #     pass
-    #     # get input file
-    #     # cipher file
-    #     # outfile in .b64 with original name
-
-    # def decipher(self):
-    #     pass
-    #     # get input file .b64 format
-    #     # decipher file
-    #     # outifle with original name and format
-
-    # def main(self):
-
-    #     command = int(input("1 or 2: "))
-    #     if command == 1:
-    #         with open('input', 'rb') as file:
-    #             plain_text = file.read()
-    #         plain_text = base64.b64encode(plain_text)
-    #         ciphertext = self.feistel_cipher(plain_text, keys)
-    #         with open('output', 'wb') as file:
-    #             file.write(ciphertext)
-    #     elif command == 2:
-    #         with open('input', 'rb') as file:
-    #             plain_text = file.read()
-    #         ciphertext = self.feistel_decipher(plain_text, keys)
-    #         with open('output', 'wb') as file:
-    #             file.write(base64.b64decode(ciphertext))
-
 class Encrypt(CipherAlgo):
 
     def __init__(self, app):
@@ -96,7 +67,6 @@ class Encrypt(CipherAlgo):
     def actionClicked(self):
         selectedFile = self.app.FileV.getSingleSelectedFile()
         fileName = self.app.FileS.engine.fileName(selectedFile)
-        print(fileName)
         readBinary = self.app.FileO.readBinaryFile(selectedFile)
         plain_text = base64.b64encode(readBinary)
         ciphertext = str.encode(f"{fileName}") + str.encode("\n") + super().feistel_cipher(plain_text)
@@ -115,7 +85,6 @@ class Decrypt(CipherAlgo):
         selectedFile = self.app.FileV.getSingleSelectedFile()
         readBinary = self.app.FileO.readBinaryFile(selectedFile)
         fileName, cipher = readBinary.split(b'\n')
-        print(fileName, cipher)
         deciphertext = super().feistel_decipher(cipher)
         self.app.FileO.newFileBinarySilent(f"{fileName.decode()}", base64.b64decode(deciphertext))
 
