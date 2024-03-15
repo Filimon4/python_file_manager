@@ -8,6 +8,8 @@
         "startWindow.py",
         "FileView.py",
         "FolderSelectorDialog.py",
-        "CipherAlgo.py"
+        "CipherAlgo.py",
+        "FileIntegrityChecker.py",
+        "FileEditor.py"
     ]
 }

@@ -17,9 +17,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QMainWindow, QMenu,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QToolBar, QTreeView, QVBoxLayout, QWidget)
+    QLabel, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QToolBar,
+    QTreeView, QVBoxLayout, QWidget)
 import rc_icons
 
 class Ui_MainWindow(object):
@@ -136,6 +136,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.undo_btn.sizePolicy().hasHeightForWidth())
         self.undo_btn.setSizePolicy(sizePolicy1)
+        self.undo_btn.setMaximumSize(QSize(30, 30))
         icon10 = QIcon()
         icon10.addFile(u":/imgs_file_manager/undo-alt.png", QSize(), QIcon.Normal, QIcon.Off)
         self.undo_btn.setIcon(icon10)
@@ -148,6 +149,7 @@ class Ui_MainWindow(object):
         self.redo_btn.setEnabled(True)
         sizePolicy1.setHeightForWidth(self.redo_btn.sizePolicy().hasHeightForWidth())
         self.redo_btn.setSizePolicy(sizePolicy1)
+        self.redo_btn.setMaximumSize(QSize(30, 30))
         icon11 = QIcon()
         icon11.addFile(u":/imgs_file_manager/redo-alt.png", QSize(), QIcon.Normal, QIcon.Off)
         self.redo_btn.setIcon(icon11)
@@ -159,6 +161,7 @@ class Ui_MainWindow(object):
         self.up_btn.setObjectName(u"up_btn")
         sizePolicy1.setHeightForWidth(self.up_btn.sizePolicy().hasHeightForWidth())
         self.up_btn.setSizePolicy(sizePolicy1)
+        self.up_btn.setMaximumSize(QSize(30, 30))
         icon12 = QIcon()
         icon12.addFile(u":/imgs_file_manager/level-up.png", QSize(), QIcon.Normal, QIcon.Off)
         self.up_btn.setIcon(icon12)
@@ -178,24 +181,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.directory)
 
-        self.find = QLineEdit(self.centralwidget)
-        self.find.setObjectName(u"find")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.find.sizePolicy().hasHeightForWidth())
-        self.find.setSizePolicy(sizePolicy2)
-        self.find.setStyleSheet(u"border: 1px solid black;\n"
-"border-radius: 5px;\n"
-"")
-
-        self.horizontalLayout_2.addWidget(self.find)
-
         self.horizontalLayout_2.setStretch(0, 1)
         self.horizontalLayout_2.setStretch(1, 1)
         self.horizontalLayout_2.setStretch(2, 1)
         self.horizontalLayout_2.setStretch(3, 8)
-        self.horizontalLayout_2.setStretch(4, 3)
 
         self.gridLayout.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
 

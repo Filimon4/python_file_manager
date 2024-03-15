@@ -5,19 +5,18 @@ class FileSystem():
     def __init__(self, app):
         self.app = app
 
-        self.currentDir = ''
         self.savedFiles = []
 
         self.engine = QFileSystemModel()
-        self.engine.setRootPath(QDir.currentPath())
+        self.engine.setRootPath(self.app.currentDir)
 
     @property
     def Dir(self):
-        return self.currentDir
+        return self.app.currentDir
 
     @Dir.setter
     def Dir(self, dir):
-        self.currentDir = dir
+        self.app.setCurrentFolder_Signal.emit(dir)
 
     @property
     def _engine(self):

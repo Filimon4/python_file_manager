@@ -1,5 +1,7 @@
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem, QFileDialog, QDialog
 from PySide6.QtCore import QSize, QDir, Qt, QSortFilterProxyModel, QRegularExpression
+import re
 
 class DiskButton(QPushButton):
     def __init__(self, disks, path):
@@ -29,25 +31,83 @@ class Disks:
     def navigateToDisk(self, path):
         self.app.rendeRoot_Signal.emit(path)
 
+class FileListWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.current_path = QDir.rootPath()  # Start with the root directory
+        self.original_items = []
+
+        self.search_edit = QLineEdit()
+        self.list_widget = QListWidget()
+
+        self.layout = QVBoxLayout(self)
+        self.layout.addWidget(self.search_edit)
+        self.layout.addWidget(self.list_widget)
+
+        self.populate_list()
+
+        self.search_edit.textChanged.connect(self.handle_search_text_changed)
+
+    def populate_list(self):
+        self.list_widget.clear()
+        self.original_items = []
+
+        dir_model = QDir(self.current_path)
+
+        # List files and directories
+        entries = dir_model.entryList(QDir.AllEntries | QDir.NoDotAndDotDot)
+        for entry in entries:
+            list_item = QListWidgetItem(entry)
+            self.original_items.append(list_item)
+            self.list_widget.addItem(list_item)
+
+    def handle_search_text_changed(self, text):
+        if text:
+            self.filter_items(text)
+        else:
+            self.list_widget.clear()
+            self.list_widget.addItems(self.original_items)
+
+    def filter_items(self, filter_text):
+        self.list_widget.clear()
+        filtered_items = []
+        for item in self.original_items:
+            print(item.text())
+        # self.list_widget.addItems(filtered_items)
+
+    def browse_directory(self):
+        directory = QFileDialog.getExistingDirectory(self, "Select Directory", self.current_path)
+        if directory:
+            self.current_path = directory
+            self.populate_list()
+
 class CustomSortFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, model):
         super().__init__()
         self.model = model
         self.setSourceModel(model)
         self.setFilterRegularExpression(QRegularExpression(''))
+        self.regex = ''
 
     def setCustomFilter(self, regex):
         self.setFilterRegularExpression(regex)
 
+    def changeSearch(self, text):
+        print(text)
+        self.setFilterRegularExpression(QRegularExpression(f"{text}", QRegularExpression.CaseInsensitiveOption))
+        self.regex = text
+
     def filterAcceptsRow(self, sourceRow, sourceParent):
-        # print(f"SourceRow: {sourceRow}")
-        # print(f"SourceParent {sourceParent}")
         sourceIndex = self.model.index(sourceRow, 0, sourceParent)
-        # print(f"SourceIndex: {sourceIndex}")
         data = self.model.data(sourceIndex)
-        # print(f"Data: {data}")
+        root_path = self.model.rootPath()
+        root_path = QDir(root_path).canonicalPath()
+        root_path = QDir.cleanPath(root_path)
+        root_index_path = self.model.index(root_path)
 
         return True
+
 
 class FileView(QWidget):
     def __init__(self, app):
@@ -59,8 +119,6 @@ class FileView(QWidget):
         self.next_move = []
 
         self.tree_ui = self.app.ui.treeView
-        self.find_ui = self.app.ui.find
-        self.find_ui.textChanged.connect(self.setRegex)
 
         self.tree = QListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
@@ -93,23 +151,14 @@ class FileView(QWidget):
         self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
         # self.tree.setRootIndex(index)
 
-    def setRegex(self, text):
-        root = self.rootIndex
-        self.proxyModel.setCustomFilter(QRegularExpression(f'{text}'))
-        self.rootIndex = root
-
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()
         uniqueFiles = []
         for file in files:
-            print(file)
-            print(self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file)))
             path = self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file))
             if not path in uniqueFiles:
                 uniqueFiles.append(path)
         uniqueFiles = [self.app.FileS.engine.index(x) for x in uniqueFiles]
-        print(uniqueFiles[0])
-        print(self.proxyModel.mapFromSource(uniqueFiles[0]))
         return uniqueFiles
 
     def getSingleSelectedFile(self):

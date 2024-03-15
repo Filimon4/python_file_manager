@@ -14,10 +14,8 @@ from FileOperations import FileOperations
 from FileSystem import FileSystem
 from FileView import FileView, Disks
 from CipherAlgo import Encrypt, Decrypt
+from FileEditor import TextEditorDialog
 # -- -- -- --
-
-SETTINGS_NAME = "FileExplorer"
-PRESET_NAME = "Preset_1"
 
 class ActionsApp():
 
@@ -56,6 +54,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     treeClicked_Signal = Signal((QMouseEvent))
     rendeRoot_Signal = Signal((str))
     setSavedFiles_Signal = Signal((list))
+    setCurrentFolder_Signal = Signal((str))
     def __init__(self):
         super().__init__()
 
@@ -65,15 +64,11 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.currentDir = ""
         self.savedFiles = []
 
-        settings = QSettings(SETTINGS_NAME, PRESET_NAME)
-        current_dir = settings.value("current_dir")
-        if current_dir:
-            self.currentDir = current_dir
-
         # Signals
         self.treeClicked_Signal[QMouseEvent].connect(self.treeClicked)
         self.rendeRoot_Signal[str].connect(self.renderNewRoot)
         self.setSavedFiles_Signal[list].connect(self.setSavedFiles)
+        self.setCurrentFolder_Signal[str].connect(self.setCurrentFolder)
 
         # ui.ui
         self.ui = Ui_MainWindow()
@@ -105,28 +100,35 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
 
     @Slot(QMouseEvent)
     def treeClicked(self, index):
-        print(index)
         # file = self.FileS.engine.filePath(index)
         file = self.FileS.engine.filePath(self.FileV.proxyModel.mapToSource(index))
-        print('here')
         if os.path.isdir(file):
             self.filePath.setText(f"{file}")
             self.FileV.last_move.insert(0, self.currentDir)
             self.renderNewRoot(file)
+        elif os.path.isfile(file):
+            window = TextEditorDialog(file)
+            window.exec_()
 
     @Slot(str)
     def renderNewRoot(self, dir):
-        print(dir)
         self.filePath.setText(f"{dir}")
         dirIndex = self.FileS._engine.index(dir)
         self.FileV.rootIndex = dirIndex
         self.currentDir = dir
         self.FileV.update_move_btn()
         self.FileV.tree.clearSelection()
+        ###
+        self.FileS.engine.setRootPath(dir)
+        # print(self.FileS.engine.rootPath())
 
     @Slot(list)
     def setSavedFiles(self, files):
         self.savedFiles = files
+
+    @Slot(str)
+    def setCurrentFolder(self, dir):
+        self.currentDir = dir
 
     def resizeEvent(self, event):
         self.FileV.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
@@ -135,6 +137,5 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.FileV.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 
     def closeEvent(self, event):
-        settings = QSettings(SETTINGS_NAME, PRESET_NAME)
-        settings.setValue("current_dir", self.currentDir)
+        pass
 

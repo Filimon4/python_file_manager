@@ -34,16 +34,16 @@ class FolderSelectorDialog(QDialog):
         self.tree_view.selectionModel().selectionChanged.connect(self.handle_selection_change)
 
     def handle_selection_change(self, selected, deselected):
-            selected_indexes = selected.indexes()
-            if selected_indexes:
-                current_index = selected_indexes[0]
-                selected_directory = self.model.filePath(current_index)
-                self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
+        selected_indexes = selected.indexes()
+        if selected_indexes:
+            current_index = selected_indexes[0]
+            selected_directory = self.model.filePath(current_index)
+            self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
 
-                self.folder_name_line_edit.setText(selected_directory)
-            else:
-                self.setEnabled_ok_button(False)
-                self.folder_name_line_edit.clear()
+            self.folder_name_line_edit.setText(selected_directory)
+        else:
+            self.setEnabled_ok_button(False)
+            self.folder_name_line_edit.clear()
 
     def setEnabled_ok_button(self, enabled):
         ok_button = self.layout().itemAt(1).widget()

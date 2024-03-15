@@ -2,7 +2,7 @@ import base64
 from typing import List
 
 class CipherAlgo:
-    defaultKeys = [0xA1B2C3D4, 0xE5F67890, 0x1A2B3C4D, 0x5E6F7890]
+    defaultKeys = [0xA1B2C3D4, 0xE5F67890, 0x1A2B3C4D, 0x5E6F7890] # так нельзя
     def __init__(self):
         self.input = ''
         self.output = ''
@@ -74,7 +74,6 @@ class Encrypt(CipherAlgo):
 
 
 class Decrypt(CipherAlgo):
-
     def __init__(self, app):
         super().__init__()
         self.app = app
