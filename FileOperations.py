@@ -4,6 +4,7 @@ import hashlib
 from FolderSelectorDialog import FolderSelectorDialog
 from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog
 from PySide6.QtCore import QDir, QFile
+from hashAlgo import MD5
 
 class FileOperations:
 
@@ -121,7 +122,7 @@ class FileOperations:
     def getHashOfFile(self, path):
         hash = None
         if path and os.path.exists(path) and os.path.isfile(path):
-            md5 = hashlib.md5()
+            md5 = MD5()
             with open(path, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     md5.update(chunk)

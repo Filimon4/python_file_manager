@@ -10,6 +10,7 @@
         "FolderSelectorDialog.py",
         "CipherAlgo.py",
         "FileIntegrityChecker.py",
-        "FileEditor.py"
+        "FileEditor.py",
+        "hashAlgo.py"
     ]
 }
