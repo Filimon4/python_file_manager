@@ -21,18 +21,18 @@ class CipherDialog(QDialog):
 
         self.file_to_cipher_edit = QLineEdit()
         self.output_file_edit = QLineEdit()
-        self.b1_spinbox = QLineEdit()
-        self.b1_spinbox.setInputMask("HHHHHHHH")
-        self.b1_spinbox.setMaxLength(8)
-        self.b2_spinbox = QLineEdit()
-        self.b2_spinbox.setInputMask("HHHHHHHH")
-        self.b2_spinbox.setMaxLength(8)
-        self.b3_spinbox = QLineEdit()
-        self.b3_spinbox.setInputMask("HHHHHHHH")
-        self.b3_spinbox.setMaxLength(8)
-        self.b4_spinbox = QLineEdit()
-        self.b4_spinbox.setInputMask("HHHHHHHH")
-        self.b4_spinbox.setMaxLength(8)
+        self.b1_box = QLineEdit()
+        self.b1_box.setInputMask("HHHHHHHH")
+        self.b1_box.setMaxLength(8)
+        self.b2_box = QLineEdit()
+        self.b2_box.setInputMask("HHHHHHHH")
+        self.b2_box.setMaxLength(8)
+        self.b3_box = QLineEdit()
+        self.b3_box.setInputMask("HHHHHHHH")
+        self.b3_box.setMaxLength(8)
+        self.b4_box = QLineEdit()
+        self.b4_box.setInputMask("HHHHHHHH")
+        self.b4_box.setMaxLength(8)
 
         self.init_ui()
 
@@ -56,7 +56,7 @@ class CipherDialog(QDialog):
 
         cipher_params_layout = QVBoxLayout()
         cipher_params_layout.addWidget(QLabel("Ключи для шифрования:"))
-        for label_text, spinbox in zip(["K1:", "K2:", "K3:", "K4:"], [self.b1_spinbox, self.b2_spinbox, self.b3_spinbox, self.b4_spinbox]):
+        for label_text, spinbox in zip(["K1:", "K2:", "K3:", "K4:"], [self.b1_box, self.b2_box, self.b3_box, self.b4_box]):
             cipher_keys_layout = QHBoxLayout()
             cipher_keys_layout.addWidget(QLabel(label_text), 1)
             cipher_keys_layout.addWidget(spinbox, 100)
@@ -83,10 +83,10 @@ class CipherDialog(QDialog):
     def ok_clicked(self):
         file_to_cipher = self.file_to_cipher_edit.text().strip()
         output_file_path = self.output_file_edit.text().strip()
-        b1 = self.b1_spinbox.value()
-        b2 = self.b2_spinbox.value()
-        b3 = self.b3_spinbox.value()
-        b4 = self.b4_spinbox.value()
+        b1 = self.b1_box.text()
+        b2 = self.b2_box.text()
+        b3 = self.b3_box.text()
+        b4 = self.b4_box.text()
 
         if not file_to_cipher or not output_file_path:
             print("Please provide both input and output file paths.")
@@ -170,11 +170,11 @@ class Encrypt(CipherAlgo):
         self.actionCipher.triggered.connect(self.actionClicked)
 
     def actionClicked(self):
+        selectedFile = self.app.FileV.getSingleSelectedFile()
 
         dialog = CipherDialog()
         dialog.exec_()
 
-        # selectedFile = self.app.FileV.getSingleSelectedFile()
         # fileName = self.app.FileS.engine.fileName(selectedFile)
         # readBinary = self.app.FileO.readBinaryFile(selectedFile)
         # plain_text = base64.b64encode(readBinary)
