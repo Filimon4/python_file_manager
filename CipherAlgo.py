@@ -1,8 +1,113 @@
 import base64
 from typing import List
+import json
+import os
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QFileDialog,
+    QSpinBox,
+)
+
+class CipherDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Cipher Parameters")
+
+        self.file_to_cipher_edit = QLineEdit()
+        self.output_file_edit = QLineEdit()
+        self.b1_spinbox = QLineEdit()
+        self.b1_spinbox.setInputMask("HHHHHHHH")
+        self.b1_spinbox.setMaxLength(8)
+        self.b2_spinbox = QLineEdit()
+        self.b2_spinbox.setInputMask("HHHHHHHH")
+        self.b2_spinbox.setMaxLength(8)
+        self.b3_spinbox = QLineEdit()
+        self.b3_spinbox.setInputMask("HHHHHHHH")
+        self.b3_spinbox.setMaxLength(8)
+        self.b4_spinbox = QLineEdit()
+        self.b4_spinbox.setInputMask("HHHHHHHH")
+        self.b4_spinbox.setMaxLength(8)
+
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout()
+
+        file_to_cipher_layout = QVBoxLayout()
+        file_to_cipher_input = QHBoxLayout()
+        file_to_cipher_layout.addWidget(QLabel("Зашифровать данные из:"))
+        file_to_cipher_input.addWidget(self.file_to_cipher_edit)
+        file_to_cipher_layout.addLayout(file_to_cipher_input)
+        browse_button = QPushButton("Browse") # change to created input file
+        browse_button.clicked.connect(self.browse_file_to_cipher)
+        file_to_cipher_input.addWidget(browse_button)
+        layout.addLayout(file_to_cipher_layout)
+
+        output_file_layout = QVBoxLayout()
+        output_file_layout.addWidget(QLabel("Сохранить зашифрованные данные в:"))
+        output_file_layout.addWidget(self.output_file_edit)
+        layout.addLayout(output_file_layout)
+
+        cipher_params_layout = QVBoxLayout()
+        cipher_params_layout.addWidget(QLabel("Ключи для шифрования:"))
+        for label_text, spinbox in zip(["K1:", "K2:", "K3:", "K4:"], [self.b1_spinbox, self.b2_spinbox, self.b3_spinbox, self.b4_spinbox]):
+            cipher_keys_layout = QHBoxLayout()
+            cipher_keys_layout.addWidget(QLabel(label_text), 1)
+            cipher_keys_layout.addWidget(spinbox, 100)
+            cipher_params_layout.addLayout(cipher_keys_layout)
+        layout.addLayout(cipher_params_layout)
+
+        ok_button = QPushButton("OK")
+        ok_button.clicked.connect(self.ok_clicked)
+        layout.addWidget(ok_button)
+
+        self.setLayout(layout)
+
+    def browse_file_to_cipher(self):
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                self.file_to_cipher_edit.setText(selected_files[0])
+
+    def is_file_path_available(self, file_path):
+        return not os.path.exists(file_path)
+
+    def ok_clicked(self):
+        file_to_cipher = self.file_to_cipher_edit.text().strip()
+        output_file_path = self.output_file_edit.text().strip()
+        b1 = self.b1_spinbox.value()
+        b2 = self.b2_spinbox.value()
+        b3 = self.b3_spinbox.value()
+        b4 = self.b4_spinbox.value()
+
+        if not file_to_cipher or not output_file_path:
+            print("Please provide both input and output file paths.")
+            return
+
+        if not self.is_file_path_available(output_file_path):
+            print("Output file path already exists. Choose a different one.")
+            return
+
+        # Call your cipher algorithm function with the provided parameters here
+        print("Ciphering...")
+        print(f"File to Cipher: {file_to_cipher}")
+        print(f"Output File Path: {output_file_path}")
+        print(f"Cipher Parameters: {b1}, {b2}, {b3}, {b4}")
 
 class CipherAlgo:
-    defaultKeys = [0xA1B2C3D4, 0xE5F67890, 0x1A2B3C4D, 0x5E6F7890] # так нельзя
+    defaultKeys = []
+    with open('./keys.json', "r") as f:
+        data = json.load(f)
+        for i in data:
+            defaultKeys.append(data[i])
     def __init__(self):
         self.input = ''
         self.output = ''
@@ -65,12 +170,16 @@ class Encrypt(CipherAlgo):
         self.actionCipher.triggered.connect(self.actionClicked)
 
     def actionClicked(self):
-        selectedFile = self.app.FileV.getSingleSelectedFile()
-        fileName = self.app.FileS.engine.fileName(selectedFile)
-        readBinary = self.app.FileO.readBinaryFile(selectedFile)
-        plain_text = base64.b64encode(readBinary)
-        ciphertext = str.encode(f"{fileName}") + str.encode("\n") + super().feistel_cipher(plain_text)
-        self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
+
+        dialog = CipherDialog()
+        dialog.exec_()
+
+        # selectedFile = self.app.FileV.getSingleSelectedFile()
+        # fileName = self.app.FileS.engine.fileName(selectedFile)
+        # readBinary = self.app.FileO.readBinaryFile(selectedFile)
+        # plain_text = base64.b64encode(readBinary)
+        # ciphertext = str.encode(f"{fileName}") + str.encode("\n") + super().feistel_cipher(plain_text)
+        # self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
 
 
 class Decrypt(CipherAlgo):

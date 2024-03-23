@@ -7,7 +7,7 @@ class TextEditorDialog(QDialog):
     def __init__(self, filePath=None):
         super().__init__()
 
-        self.filePath = filePath or self.getFilePathFromDialog()
+        self.filePath = filePath
 
         self.setWindowTitle("Text Editor")
         self.setGeometry(100, 100, 600, 400)
@@ -29,23 +29,9 @@ class TextEditorDialog(QDialog):
         if self.filePath:
             self.loadFile()
 
-    def getFilePathFromDialog(self):
-        filePath, _ = QFileDialog.getOpenFileName(self, "Open File", "", "JSON Files (*.json);;XML Files (*.xml)")
-        return filePath
-
     def loadFile(self):
-        if self.filePath.endswith('.json'):
-            self.textEdit.setPlainText(self.readJsonFile(self.filePath))
-        elif self.filePath.endswith('.xml'):
-            self.textEdit.setPlainText(self.readXmlFile(self.filePath))
-
-    def readJsonFile(self, filePath):
-        with open(filePath, 'r') as f:
-            return f.read()
-
-    def readXmlFile(self, filePath):
-        with open(filePath, 'r') as f:
-            return f.read()
+        with open(self.filePath, "r") as f:
+            self.textEdit.setPlainText(f.read())
 
     def save(self):
         if not self.filePath:
