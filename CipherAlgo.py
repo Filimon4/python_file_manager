@@ -3,6 +3,7 @@ from typing import List
 import json
 import os
 import random
+import binascii
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog,
@@ -96,7 +97,6 @@ class CipherDialog(QDialog):
             data = json.load(f)
             for i in data:
                 keys.append(data[i])
-        print(keys)
         self.b1_box.setText(keys[0])
         self.b2_box.setText(keys[1])
         self.b3_box.setText(keys[2])
@@ -136,26 +136,20 @@ class CipherDialog(QDialog):
         return not os.path.exists(file_path)
 
     def ok_clicked(self):
-        file_to_cipher = self.file_to_cipher_edit.text().strip()
-        output_file_path = self.output_file_edit.text().strip()
-        b1 = self.b1_box.text()
-        b2 = self.b2_box.text()
-        b3 = self.b3_box.text()
-        b4 = self.b4_box.text()
+        self.file_to_cipher = self.file_to_cipher_edit.text().strip()
+        self.output_file_path = self.output_file_edit.text().strip()
+        self.k1 = self.b1_box.text()
+        self.k2 = self.b2_box.text()
+        self.k3 = self.b3_box.text()
+        self.k4 = self.b4_box.text()
 
-        if not file_to_cipher or not output_file_path:
+        if not self.file_to_cipher or not self.output_file_path:
             print("Please provide both input and output file paths.")
             return
 
-        if not self.is_file_path_available(output_file_path):
+        if not self.is_file_path_available(self.output_file_path):
             print("Output file path already exists. Choose a different one.")
             return
-
-        # Call your cipher algorithm function with the provided parameters here
-        print("Ciphering...")
-        print(f"File to Cipher: {file_to_cipher}")
-        print(f"Output File Path: {output_file_path}")
-        print(f"Cipher Parameters: {b1}, {b2}, {b3}, {b4}")
         self.accept()
 
 class CipherAlgo:
@@ -172,7 +166,9 @@ class CipherAlgo:
         new_right = left ^ key
         return right, new_right
 
-    def feistel_cipher(self, plaintext: bytes, keys: List[int] = defaultKeys) -> bytes:
+    def feistel_cipher(self, plaintext: bytes, keys: List[int]) -> bytes:
+        if not keys:
+            return
         padding_length = 8 - (len(plaintext) % 8)
         plaintext += bytes([padding_length] * padding_length)
 
@@ -194,7 +190,9 @@ class CipherAlgo:
 
         return ciphertext
 
-    def feistel_decipher(self, ciphertext: bytes, keys: List[int] = defaultKeys) -> bytes:
+    def feistel_decipher(self, ciphertext: bytes, keys: List[int]) -> bytes:
+        if not keys:
+            return
         blocks = [ciphertext[i:i+8] for i in range(0, len(ciphertext), 8)]
         plaintext = b''
 
@@ -235,13 +233,20 @@ class Encrypt(CipherAlgo):
             fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
         dialog = CipherDialog(filePath, fileParentPath)
         result = dialog.exec_()
+        if result:
+            k1 = int(dialog.k1, 16)
+            k2 = int(dialog.k2, 16)
+            k3 = int(dialog.k3, 16)
+            k4 = int(dialog.k4, 16)
+            file_to_cipher = self.app.FileS.engine.index(dialog.file_to_cipher)
+            output_file_path = self.app.FileS.engine.index(dialog.output_file_path)
 
-
-        # fileName = self.app.FileS.engine.fileName(selectedFile)
-        # readBinary = self.app.FileO.readBinaryFile(selectedFile)
-        # plain_text = base64.b64encode(readBinary)
-        # ciphertext = str.encode(f"{fileName}") + str.encode("\n") + super().feistel_cipher(plain_text)
-        # self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
+            fileName = self.app.FileS.engine.fileName(output_file_path)
+            print(dialog.output_file_path)
+            readBinary = self.app.FileO.readBinaryFile(file_to_cipher)
+            plain_text = base64.b64encode(readBinary)
+            ciphertext = super().feistel_cipher(plain_text, [k1,k2,k3,k4])
+            self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
 
 
 class Decrypt(CipherAlgo):
