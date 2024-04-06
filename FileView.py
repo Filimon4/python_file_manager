@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import QWidget, QAbstractItemView, QListView, QPushButton, QSizePolicy, QSpacerItem
 from PySide6.QtWidgets import QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem, QFileDialog, QDialog
-from PySide6.QtCore import QSize, QDir, Qt, QSortFilterProxyModel, QRegularExpression
-import re
+from PySide6.QtCore import QSize, QDir, Qt, QSortFilterProxyModel, QRegularExpression, Signal
 
 class DiskButton(QPushButton):
     def __init__(self, disks, path):
@@ -109,6 +108,19 @@ class CustomSortFilterProxyModel(QSortFilterProxyModel):
         return True
 
 
+class CustomListView(QListView):
+    enterPressed = Signal(str)
+
+    def __init__(self, ui):
+        super().__init__(ui)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+            self.enterPressed.emit(event)
+        else:
+            super().keyPressEvent(event)
+
+
 class FileView(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -120,9 +132,11 @@ class FileView(QWidget):
 
         self.tree_ui = self.app.ui.treeView
 
-        self.tree = QListView(self.tree_ui)
+        self.tree = CustomListView(self.tree_ui)
         self.tree.resize(QSize(self.tree_ui.width(), self.tree_ui.height()))
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+        self.tree.enterPressed.connect(self.onEnterPressed)  # Connect the signal to a slot
 
         self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
 
@@ -230,4 +244,14 @@ class FileView(QWidget):
 
     def treeClicked(self, index):
         self.app.treeClicked_Signal.emit(index)
+
+    def onEnterPressed(self, event):
+        enterFile = self.getSingleSelectedFile()
+        if enterFile:
+            enterFile = self.proxyModel.mapFromSource(enterFile)
+            self.app.treeClicked_Signal.emit(enterFile)
+
+
+
+
 
