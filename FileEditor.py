@@ -41,6 +41,6 @@ class TextEditorDialog(QDialog):
                 f.write(self.textEdit.toPlainText())
 
     def changeFont(self):
-        font, ok = QFontDialog.getFont()
+        ok, font = QFontDialog.getFont()
         if ok:
             self.textEdit.setFont(font)
