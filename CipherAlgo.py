@@ -32,8 +32,7 @@ class CipherDialog(QDialog):
             self.file_to_cipher_edit.setText(self.selectedFile)
         self.output_file_edit = QLineEdit()
         if self.parentOfSelected:
-            outputFileName = f"{self.fileSelected.split('.')[0]}-CipherText.b64"
-            self.output_file_edit.setText(f"{self.parentOfSelected}/{outputFileName}")
+            self.output_file_edit.setText(f"{self.parentOfSelected}/")
         self.b1_box = QLineEdit()
         self.b1_box.setInputMask("HHHHHHHH")
         self.b1_box.setMaxLength(8)
@@ -158,6 +157,8 @@ class CipherAlgo:
         data = json.load(f)
         for i in data:
             defaultKeys.append(data[i])
+
+    print(defaultKeys)
     def __init__(self):
         self.input = ''
         self.output = ''
@@ -192,7 +193,7 @@ class CipherAlgo:
 
     def feistel_decipher(self, ciphertext: bytes, keys: List[int]) -> bytes:
         if not keys:
-            return
+            keys = self.defaultKeys
         blocks = [ciphertext[i:i+8] for i in range(0, len(ciphertext), 8)]
         plaintext = b''
 
@@ -239,12 +240,11 @@ class Encrypt(CipherAlgo):
             k3 = int(dialog.k3, 16)
             k4 = int(dialog.k4, 16)
             file_to_cipher = self.app.FileS.engine.index(dialog.file_to_cipher)
-            output_file_path = self.app.FileS.engine.index(dialog.output_file_path)
 
-            fileName = self.app.FileS.engine.fileName(output_file_path)
-            print(dialog.output_file_path)
+            fileName = dialog.output_file_path.split('/')[-1]
             readBinary = self.app.FileO.readBinaryFile(file_to_cipher)
             plain_text = base64.b64encode(readBinary)
+
             ciphertext = super().feistel_cipher(plain_text, [k1,k2,k3,k4])
             self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
 
@@ -258,8 +258,25 @@ class Decrypt(CipherAlgo):
 
     def actionClicked(self):
         selectedFile = self.app.FileV.getSingleSelectedFile()
-        readBinary = self.app.FileO.readBinaryFile(selectedFile)
-        fileName, cipher = readBinary.split(b'\n')
-        deciphertext = super().feistel_decipher(cipher)
-        self.app.FileO.newFileBinarySilent(f"{fileName.decode()}", base64.b64decode(deciphertext))
+
+        filePath = ''
+        fileParentPath = ''
+        if selectedFile:
+            filePath = self.app.FileS.engine.filePath(selectedFile)
+            fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
+        dialog = CipherDialog(filePath, fileParentPath)
+        result = dialog.exec_()
+        if result:
+            k1 = int(dialog.k1, 16)
+            k2 = int(dialog.k2, 16)
+            k3 = int(dialog.k3, 16)
+            k4 = int(dialog.k4, 16)
+            file_to_decipher = self.app.FileS.engine.index(dialog.file_to_cipher)
+
+            fileName = dialog.output_file_path.split('/')[-1]
+
+            selectedFile = self.app.FileV.getSingleSelectedFile()
+            readBinary = self.app.FileO.readBinaryFile(file_to_decipher)
+            deciphertext = super().feistel_decipher(readBinary, keys=[k1,k2,k3,k4])
+            self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.txt", base64.b64decode(deciphertext))
 
