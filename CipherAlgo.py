@@ -5,6 +5,7 @@ import os
 import random
 import binascii
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QLabel,
@@ -20,7 +21,8 @@ from PySide6.QtWidgets import (
 class CipherDialog(QDialog):
     def __init__(self, selectedFile='', parentOfSelectedFile=''):
         super().__init__()
-        self.setWindowTitle("Cipher Parameters")
+        app_icon = QIcon('app_icon.png')
+        self.setWindowIcon(app_icon)
 
         self.selectedFile = selectedFile
         self.parentOfSelected = parentOfSelectedFile
@@ -49,7 +51,6 @@ class CipherDialog(QDialog):
         self.rewriteKeys = QCheckBox('Перезаписать ключи')
         self.rewriteKeys.setChecked(False)
 
-
         self.init_ui()
 
     def init_ui(self):
@@ -57,7 +58,7 @@ class CipherDialog(QDialog):
 
         file_to_cipher_layout = QVBoxLayout()
         file_to_cipher_input = QHBoxLayout()
-        file_to_cipher_layout.addWidget(QLabel("Зашифровать данные из:"))
+        file_to_cipher_layout.addWidget(QLabel(self.InputTitle))
         file_to_cipher_input.addWidget(self.file_to_cipher_edit)
         file_to_cipher_layout.addLayout(file_to_cipher_input)
         browse_button = QPushButton("Выбрать") # change to created input file
@@ -66,12 +67,12 @@ class CipherDialog(QDialog):
         layout.addLayout(file_to_cipher_layout)
 
         output_file_layout = QVBoxLayout()
-        output_file_layout.addWidget(QLabel("Сохранить зашифрованные данные в:"))
+        output_file_layout.addWidget(QLabel(self.OutputTitle))
         output_file_layout.addWidget(self.output_file_edit)
         layout.addLayout(output_file_layout)
 
         cipher_params_layout = QVBoxLayout()
-        cipher_params_layout.addWidget(QLabel("Ключи для шифрования:"))
+        cipher_params_layout.addWidget(QLabel(self.keysTitle))
         generate_button = QPushButton('Сгенерировать новые ключи')
         generate_button.clicked.connect(self.set_generate_keys)
         use_prev_keys_button = QPushButton('Использовать предыдущие ключи')
@@ -151,6 +152,22 @@ class CipherDialog(QDialog):
             return
         self.accept()
 
+class EncryptCipherDialog(CipherDialog):
+    def __init__(self, selectedFile='', parentOfSelectedFile=''):
+        self.OutputTitle = "Пеместить данные в:"
+        self.InputTitle = "Зашифровать данные из: "
+        self.keysTitle = "Ключ для шифрования"
+        super().__init__(selectedFile, parentOfSelectedFile)
+        self.setWindowTitle("Шифрование файла")
+
+class DecryptCipherDialog(CipherDialog):
+    def __init__(self, selectedFile='', parentOfSelectedFile=''):
+        self.InputTitle = "Дешифровать данне из"
+        self.OutputTitle = "Пеместить данные в:"
+        self.keysTitle = "Ключи для дешифрования"
+        super().__init__(selectedFile, parentOfSelectedFile)
+        self.setWindowTitle("Дешифровка файла")
+
 class CipherAlgo:
     defaultKeys = []
     with open('./keys.json', "r") as f:
@@ -160,8 +177,9 @@ class CipherAlgo:
 
     print(defaultKeys)
     def __init__(self):
-        self.input = ''
-        self.output = ''
+        pass
+        # self.input = ''
+        # self.output = ''
 
     def feistel_round(self, left: int, right: int, key: int) -> tuple:
         new_right = left ^ key
@@ -232,7 +250,7 @@ class Encrypt(CipherAlgo):
         if selectedFile:
             filePath = self.app.FileS.engine.filePath(selectedFile)
             fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
-        dialog = CipherDialog(filePath, fileParentPath)
+        dialog = EncryptCipherDialog(filePath, fileParentPath)
         result = dialog.exec_()
         if result:
             k1 = int(dialog.k1, 16)
@@ -264,7 +282,7 @@ class Decrypt(CipherAlgo):
         if selectedFile:
             filePath = self.app.FileS.engine.filePath(selectedFile)
             fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
-        dialog = CipherDialog(filePath, fileParentPath)
+        dialog = DecryptCipherDialog(filePath, fileParentPath)
         result = dialog.exec_()
         if result:
             k1 = int(dialog.k1, 16)

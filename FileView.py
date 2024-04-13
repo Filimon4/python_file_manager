@@ -248,7 +248,7 @@ class FileView(QWidget):
     def onEnterPressed(self, event):
         enterFile = self.getSingleSelectedFile()
         if enterFile:
-            enterFile = self.proxyModel.mapFromSource(enterFile)
+            enterFile = self.proxyModel.mapFromSource(enterFile) # uses custom proxy model
             self.app.treeClicked_Signal.emit(enterFile)
 
 
