@@ -77,26 +77,37 @@ class FileOperations:
             fileName = self.app.FileS.engine.fileName(file)
 
             hash1 = self.getAutoHash(filePath)
-            toPath = ''
+            toPath = f"{self.app.currentDir}/{fileName} Copy"
             if self.app.FileS.engine.fileInfo(file).isDir():
+                filePath = self.app.FileS.engine.filePath(file)
+                fileName = self.app.FileS.engine.fileName(file)
 
                 files = os.listdir(self.app.currentDir)
-                print(QDir(self.app.currentDir))
-                toPath = f"{self.app.currentDir}/{fileName}"
+
                 if os.path.isdir(filePath):
                     counter = 0
                     for f in files:
-                        if f.startswith(fileName):
+                        if fileName in f:
                             counter += 1
-                            print(f, counter)
-                    toPath = f"{self.app.currentDir}/{fileName} ({counter})"
-                    shutil.copytree(filePath, toPath)
+                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} Copy({counter})")
                 else:
                     shutil.copytree(filePath, toPath)
             elif self.app.FileS.engine.fileInfo(file).isFile():
-                toPath = f"{self.app.currentDir}/{fileName}"
-                shutil.copy2(filePath, toPath)
-            print(toPath)
+                filePath = self.app.FileS.engine.filePath(file)
+                fileName = self.app.FileS.engine.fileName(file)
+
+                files = os.listdir(self.app.currentDir)
+                print(files)
+
+                if os.path.isfile(filePath):
+                    counter = 0
+                    for i in files:
+                        if fileName in i:
+                            counter += 1;
+                    shutil.copy2(filePath, f"{self.app.currentDir}/{fileName} Copy({counter})")
+                else:
+                    shutil.copy2(filePath, toPath)
+
             hash2 = self.getAutoHash(toPath)
 
             if hash1 and hash2 and hash1 == hash2:
@@ -170,8 +181,6 @@ class FileOperations:
                         print("The files are the save")
                     else:
                         print("Error file itegrity is in dunger")
-
-
 
     def rename (self):
         file = self.app.FileV.getSingleSelectedFile()

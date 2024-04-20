@@ -11,6 +11,7 @@
         "CipherAlgo.py",
         "FileIntegrityChecker.py",
         "FileEditor.py",
-        "hashAlgo.py"
+        "hashAlgo.py",
+        "MessageDialog.py"
     ]
 }

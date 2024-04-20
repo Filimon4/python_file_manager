@@ -2,6 +2,7 @@ import os
 
 from PySide6.QtWidgets import (
     QMainWindow,
+    QMessageBox
 )
 from PySide6.QtCore import (
     QSize, Signal, Slot, QSettings
@@ -15,6 +16,7 @@ from FileSystem import FileSystem
 from FileView import FileView, Disks
 from CipherAlgo import Encrypt, Decrypt
 from FileEditor import TextEditorDialog
+from MessageDialog import MessageDialog
 # -- -- -- --
 
 class ActionsApp():
@@ -97,12 +99,12 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.copy_short = QShortcut(QKeySequence("Ctrl+D"), self)
         self.copy_short.activated.connect(FileOperations.delete)
 
+        messageDialog = MessageDialog(self)
+
     @Slot(QMouseEvent)
     def treeClicked(self, index):
         file = self.FileS.engine.filePath(index)
-        print(index)
         # file = self.FileS.engine.filePath(self.FileV.proxyModel.mapToSource(index))
-        print(file)
         if os.path.isdir(file):
             self.filePath.setText(f"{file}")
             self.FileV.last_move.insert(0, self.currentDir)
