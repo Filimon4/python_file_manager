@@ -138,10 +138,10 @@ class FileView(QWidget):
 
         self.tree.enterPressed.connect(self.onEnterPressed)  # Connect the signal to a slot
 
-        self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
+        # self.proxyModel = CustomSortFilterProxyModel(self.app.FileS.engine)
 
-        self.tree.setModel(self.proxyModel)
-        self.tree.setRootIndex(self.proxyModel.mapFromSource(self.app.FileS.engine.index(self.app.currentDir)))
+        self.tree.setModel(self.app.FileS.engine)
+        self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
         # self.tree.setModel(self.app.FileS.engine)
         # self.tree.setRootIndex(self.app.FileS.engine.index(self.app.currentDir))
 
@@ -162,14 +162,15 @@ class FileView(QWidget):
 
     @rootIndex.setter
     def rootIndex(self, index):
-        self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
-        # self.tree.setRootIndex(index)
+        # self.tree.setRootIndex(self.proxyModel.mapFromSource(index))
+        self.tree.setRootIndex(index)
 
     def getSelectedFiles(self):
         files = self.tree.selectionModel().selectedIndexes()
         uniqueFiles = []
         for file in files:
-            path = self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file))
+            # path = self.app.FileS.engine.filePath(self.proxyModel.mapToSource(file))
+            path = self.app.FileS.engine.filePath(file)
             if not path in uniqueFiles:
                 uniqueFiles.append(path)
         uniqueFiles = [self.app.FileS.engine.index(x) for x in uniqueFiles]
@@ -248,7 +249,7 @@ class FileView(QWidget):
     def onEnterPressed(self, event):
         enterFile = self.getSingleSelectedFile()
         if enterFile:
-            enterFile = self.proxyModel.mapFromSource(enterFile) # uses custom proxy model
+            # enterFile = self.proxyModel.mapFromSource(enterFile) # uses custom proxy model
             self.app.treeClicked_Signal.emit(enterFile)
 
 
