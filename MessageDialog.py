@@ -23,7 +23,7 @@ class MessageDialog:
         else:
             print("No")
 
-    def warning(self):
+    def critical(self):
         button = QMessageBox.critical(
             self.parent,
             "Oh dear!",

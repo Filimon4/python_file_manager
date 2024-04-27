@@ -23,12 +23,25 @@ class FileOperations:
     def newFolder(self):
         folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal)
         if ok and folderName:
-            QDir(self.app.currentDir).mkdir(f"{folderName}")
+            counter = self.getNumberOfSameName(self.app.currentDir, folderName)
+            if counter > 0:
+                QDir(self.app.currentDir).mkdir(f"{folderName} Copy({counter})")
+            else:
+                QDir(self.app.currentDir).mkdir(f"{folderName}")
 
     def newFile(self):
         fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal)
-        file = f"{self.app.currentDir}/{fileName}"
-        if ok and file:
+        if ok:
+            file = f"{self.app.currentDir}/{fileName}"
+            fileEntities = fileName.split('.')
+            counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
+            if counter > 0:
+                if len(fileEntities) == 2:
+                    file = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter}).{fileEntities[1]}"
+                else:
+                    file = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter})"
+            else:
+                file = f"{self.app.currentDir}/{fileName}"
             with open(file, "w") as file:
                 pass
 
@@ -67,6 +80,15 @@ class FileOperations:
             self.cut_files = True
             self.app.setSavedFiles_Signal.emit(files)
 
+    def getNumberOfSameName(self, filePath, fileName):
+        files = os.listdir(filePath)
+        counter = 0
+
+        for f in files:
+            if fileName in f or f.startswith(fileName):
+                counter += 1
+        return counter
+
     # add hash
     def paste(self):
         willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
@@ -82,13 +104,8 @@ class FileOperations:
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
 
-                files = os.listdir(self.app.currentDir)
-
-                if os.path.isdir(filePath):
-                    counter = 0
-                    for f in files:
-                        if fileName in f:
-                            counter += 1
+                counter = self.getNumberOfSameName(self.app.currentDir, fileName)
+                if counter > 0:
                     shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} Copy({counter})")
                 else:
                     shutil.copytree(filePath, toPath)
@@ -96,20 +113,20 @@ class FileOperations:
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
 
-                files = os.listdir(self.app.currentDir)
-                print(files)
-
-                if os.path.isfile(filePath):
-                    counter = 0
-                    for i in files:
-                        if fileName in i:
-                            counter += 1;
-                    shutil.copy2(filePath, f"{self.app.currentDir}/{fileName} Copy({counter})")
+                fileEntities = fileName.split('.')
+                counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
+                if counter > 0:
+                    if len(fileEntities) == 2:
+                        toPath = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter}).{fileEntities[1]}"
+                        shutil.copy2(filePath, toPath)
+                    else:
+                        toPath = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter})"
+                        shutil.copy2(filePath, toPath)
                 else:
                     shutil.copy2(filePath, toPath)
 
             hash2 = self.getAutoHash(toPath)
-
+            print(toPath)
             if hash1 and hash2 and hash1 == hash2:
                 print("The files are the save")
             else:

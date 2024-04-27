@@ -383,11 +383,19 @@ border-radius: 5px;
    </property>
   </action>
   <action name="actionCipher">
+   <property name="icon">
+    <iconset>
+     <normaloff>imgs_file_manager/cipher.png</normaloff>imgs_file_manager/cipher.png</iconset>
+   </property>
    <property name="text">
     <string>Зашифровать</string>
    </property>
   </action>
   <action name="actionDecipher">
+   <property name="icon">
+    <iconset>
+     <normaloff>imgs_file_manager/decipher.png</normaloff>imgs_file_manager/decipher.png</iconset>
+   </property>
    <property name="text">
     <string>Дешифровать</string>
    </property>

@@ -16,7 +16,6 @@ from FileSystem import FileSystem
 from FileView import FileView, Disks
 from CipherAlgo import Encrypt, Decrypt
 from FileEditor import TextEditorDialog
-from MessageDialog import MessageDialog
 # -- -- -- --
 
 class ActionsApp():
@@ -29,8 +28,8 @@ class ActionsApp():
         self.about_action = self.ui.actionAbout
         self.about_qt_action = self.ui.actionAbout_Qt
 
-        self.newFile_action = self.ui.actionMake_folder
-        self.newFolder_action = self.ui.actionNew_File
+        self.newFolder_action = self.ui.actionMake_folder
+        self.newFile_action = self.ui.actionNew_File
         self.delete_action = self.ui.actionDelete_folder
         self.rename_action = self.ui.actionRename
         self.move_action = self.ui.actionMove
@@ -42,8 +41,8 @@ class ActionsApp():
         self.about_qt_action.triggered.connect(self.app.FileS.about_qt)
         self.about_action.triggered.connect(self.app.FileS.about)
 
-        self.newFile_action.triggered.connect(self.app.FileO.newFolder)
-        self.newFolder_action.triggered.connect(self.app.FileO.newFile)
+        self.newFile_action.triggered.connect(self.app.FileO.newFile)
+        self.newFolder_action.triggered.connect(self.app.FileO.newFolder)
         self.delete_action.triggered.connect(self.app.FileO.delete)
         self.rename_action.triggered.connect(self.app.FileO.rename)
         self.move_action.triggered.connect(self.app.FileO.move)
@@ -98,8 +97,6 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.copy_short.activated.connect(FileOperations.cut)
         self.copy_short = QShortcut(QKeySequence("Ctrl+D"), self)
         self.copy_short.activated.connect(FileOperations.delete)
-
-        messageDialog = MessageDialog(self)
 
     @Slot(QMouseEvent)
     def treeClicked(self, index):
