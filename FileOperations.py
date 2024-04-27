@@ -89,7 +89,6 @@ class FileOperations:
                 counter += 1
         return counter
 
-    # add hash
     def paste(self):
         willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
         if not willPaste == QMessageBox.StandardButton.Yes: return
@@ -167,7 +166,6 @@ class FileOperations:
                     file_integrity += file_hash
         return file_integrity
 
-    # add hash
     def move(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:

@@ -16,6 +16,7 @@ from FileSystem import FileSystem
 from FileView import FileView, Disks
 from CipherAlgo import Encrypt, Decrypt
 from FileEditor import TextEditorDialog
+from MessageDialog import MessageDialog
 # -- -- -- --
 
 class ActionsApp():
@@ -86,6 +87,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.Encrpt = Encrypt(self)
         self.Decrpt = Decrypt(self)
         self.Disks = Disks(self)
+        self.Notif = MessageDialog(self)
 
         self.actions = ActionsApp(self)
 

@@ -5,7 +5,6 @@ class MessageDialog:
     def __init__(self, app):
 
         self.parent = app
-        self.info("have some", "one")
 
     def question(self, title, message):
         button = QMessageBox.question(self.parent, "Question dialog", "The longer message")
