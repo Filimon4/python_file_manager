@@ -2,10 +2,11 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QTreeView,QFileSy
 from PySide6.QtCore import QDir, QFileInfo
 
 class FolderSelectorDialog(QDialog):
-    def __init__(self):
+    def __init__(self, currentDir):
         super(FolderSelectorDialog, self).__init__()
 
         layout = QVBoxLayout()
+        self.currentDir = currentDir
 
         self.setWindowTitle("Выбор папки")
 
@@ -21,12 +22,18 @@ class FolderSelectorDialog(QDialog):
         self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
         self.tree_view.setModel(self.model)
 
-        ok_button = QPushButton("Ок")
-        ok_button.clicked.connect(self.accept)
+        path = ''
+        for i in self.currentDir.split('/'):
+            path += f'{i}/'
+            self.tree_view.expand(self.model.index(path))
+        self.folder_name_line_edit.setText(self.currentDir)
+        
+        self.ok_button = QPushButton("Ок")
+        self.ok_button.clicked.connect(self.accept)
         cancel_button = QPushButton("Отмена")
         cancel_button.clicked.connect(self.reject)
 
-        layout.addWidget(ok_button)
+        layout.addWidget(self.ok_button)
         layout.addWidget(cancel_button)
 
         self.setLayout(layout)
@@ -41,6 +48,10 @@ class FolderSelectorDialog(QDialog):
             self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
 
             self.folder_name_line_edit.setText(selected_directory)
+            if selected_directory == self.currentDir:
+                self.ok_button.setEnabled(False)
+            else:
+                self.ok_button.setEnabled(True)
         else:
             self.setEnabled_ok_button(False)
             self.folder_name_line_edit.clear()

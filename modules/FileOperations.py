@@ -175,7 +175,7 @@ class FileOperations:
     def move(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:
-            dia = FolderSelectorDialog()
+            dia = FolderSelectorDialog(self.app.currentDir)
             result = dia.exec_()
 
             if result == QDialog.Accepted:
