@@ -1,7 +1,6 @@
 {
     "files": [
         "FileSystem.py",
-        "FileOperations.py",
         "icons.qrc",
         "main.py",
         "mainwindow.ui",
@@ -12,6 +11,7 @@
         "FileIntegrityChecker.py",
         "FileEditor.py",
         "hashAlgo.py",
-        "MessageDialog.py"
+        "MessageDialog.py",
+        "FileActions.py"
     ]
 }

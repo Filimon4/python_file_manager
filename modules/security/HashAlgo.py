@@ -1,6 +1,6 @@
 import struct
 
-class MD5:
+class Hash:
     def __init__(self):
         self.A = 0x67452301
         self.B = 0xEFCDAB89

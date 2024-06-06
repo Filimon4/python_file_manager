@@ -1,10 +1,11 @@
 import os
 import shutil
-import hashlib
-from FolderSelectorDialog import FolderSelectorDialog
+
+from modules.dialogs import FolderSelectorDialog
+from modules.security.HashAlgo import Hash
+
 from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog
 from PySide6.QtCore import QDir, QFile
-from hashAlgo import MD5
 
 class FileOperations:
 
@@ -14,7 +15,6 @@ class FileOperations:
 
     def readBinaryFile(self, file):
         filePath = self.app.FileS.engine.filePath(file)
-        # fileName = self.app.FileS.engine.fileName(file)
         ciphertext = ""
         with open(f"{filePath}", "rb") as file:
             ciphertext = file.read()
@@ -89,6 +89,7 @@ class FileOperations:
                 counter += 1
         return counter
 
+    # * Расчёт хэша
     def paste(self):
         willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
         if not willPaste == QMessageBox.StandardButton.Yes: return
@@ -149,7 +150,7 @@ class FileOperations:
     def getHashOfFile(self, path):
         hash = None
         if path and os.path.exists(path) and os.path.isfile(path):
-            md5 = MD5()
+            md5 = Hash()
             with open(path, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     md5.update(chunk)
@@ -166,6 +167,7 @@ class FileOperations:
                     file_integrity += file_hash
         return file_integrity
 
+    # * Расчёт хэша
     def move(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:
@@ -197,7 +199,7 @@ class FileOperations:
                     else:
                         print("Error file itegrity is in dunger")
 
-    def rename (self):
+    def rename(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:
             itemPath = self.app.FileS.engine.filePath(file)

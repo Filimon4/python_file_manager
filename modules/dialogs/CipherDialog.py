@@ -1,10 +1,6 @@
-import base64
-from typing import List
 import json
 import os
 import random
-import binascii
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
@@ -14,7 +10,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFileDialog,
-    QSpinBox,
     QCheckBox
 )
 
@@ -167,134 +162,3 @@ class DecryptCipherDialog(CipherDialog):
         self.keysTitle = "Ключи для дешифрования"
         super().__init__(selectedFile, parentOfSelectedFile)
         self.setWindowTitle("Дешифровка файла")
-
-class CipherAlgo:
-    defaultKeys = []
-    with open('./keys.json', "r") as f:
-        data = json.load(f)
-        for i in data:
-            defaultKeys.append(data[i])
-
-    print(defaultKeys)
-    def __init__(self):
-        pass
-        # self.input = ''
-        # self.output = ''
-
-    def feistel_round(self, left: int, right: int, key: int) -> tuple:
-        new_right = left ^ key
-        return right, new_right
-
-    def feistel_cipher(self, plaintext: bytes, keys: List[int]) -> bytes:
-        if not keys:
-            return
-        padding_length = 8 - (len(plaintext) % 8)
-        plaintext += bytes([padding_length] * padding_length)
-
-        blocks = [plaintext[i:i+8] for i in range(0, len(plaintext), 8)]
-        ciphertext = b''
-
-        for block in blocks:
-            block_int = int.from_bytes(block, byteorder='big')
-            left = block_int >> 32
-            right = block_int & 0xFFFFFFFF
-
-            for key in keys:
-                left, right = self.feistel_round(left, right, key)
-
-            left, right = right, left
-
-            cipher_block = (left << 32 | right).to_bytes(8, byteorder='big')
-            ciphertext += cipher_block
-
-        return ciphertext
-
-    def feistel_decipher(self, ciphertext: bytes, keys: List[int]) -> bytes:
-        if not keys:
-            keys = self.defaultKeys
-        blocks = [ciphertext[i:i+8] for i in range(0, len(ciphertext), 8)]
-        plaintext = b''
-
-        for block in blocks:
-            block_int = int.from_bytes(block, byteorder='big')
-            left = block_int >> 32
-            right = block_int & 0xFFFFFFFF
-
-            for key in reversed(keys):
-                left, right = self.feistel_round(left, right, key)
-
-            left, right = right, left
-
-            plain_block = (left << 32 | right).to_bytes(8, byteorder='big')
-            plaintext += plain_block
-
-        padding_length = plaintext[-1]
-        plaintext = plaintext[:-padding_length]
-
-        return plaintext
-
-class Encrypt(CipherAlgo):
-
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-
-        self.actionCipher = self.app.ui.actionCipher
-        self.actionCipher.triggered.connect(self.actionClicked)
-
-    def actionClicked(self):
-        selectedFile = self.app.FileV.getSingleSelectedFile()
-
-        filePath = ''
-        fileParentPath = ''
-        if selectedFile:
-            filePath = self.app.FileS.engine.filePath(selectedFile)
-            fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
-        dialog = EncryptCipherDialog(filePath, fileParentPath)
-        result = dialog.exec_()
-        if result:
-            k1 = int(dialog.k1, 16)
-            k2 = int(dialog.k2, 16)
-            k3 = int(dialog.k3, 16)
-            k4 = int(dialog.k4, 16)
-            file_to_cipher = self.app.FileS.engine.index(dialog.file_to_cipher)
-
-            fileName = dialog.output_file_path.split('/')[-1]
-            readBinary = self.app.FileO.readBinaryFile(file_to_cipher)
-            plain_text = base64.b64encode(readBinary)
-
-            ciphertext = super().feistel_cipher(plain_text, [k1,k2,k3,k4])
-            self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)
-
-
-class Decrypt(CipherAlgo):
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-        self.actionDecipher = self.app.ui.actionDecipher
-        self.actionDecipher.triggered.connect(self.actionClicked)
-
-    def actionClicked(self):
-        selectedFile = self.app.FileV.getSingleSelectedFile()
-
-        filePath = ''
-        fileParentPath = ''
-        if selectedFile:
-            filePath = self.app.FileS.engine.filePath(selectedFile)
-            fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
-        dialog = DecryptCipherDialog(filePath, fileParentPath)
-        result = dialog.exec_()
-        if result:
-            k1 = int(dialog.k1, 16)
-            k2 = int(dialog.k2, 16)
-            k3 = int(dialog.k3, 16)
-            k4 = int(dialog.k4, 16)
-            file_to_decipher = self.app.FileS.engine.index(dialog.file_to_cipher)
-
-            fileName = dialog.output_file_path.split('/')[-1]
-
-            selectedFile = self.app.FileV.getSingleSelectedFile()
-            readBinary = self.app.FileO.readBinaryFile(file_to_decipher)
-            deciphertext = super().feistel_decipher(readBinary, keys=[k1,k2,k3,k4])
-            self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.txt", base64.b64decode(deciphertext))
-

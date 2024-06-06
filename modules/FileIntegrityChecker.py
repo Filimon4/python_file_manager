@@ -1,11 +1,12 @@
 import hashlib
+from modules.security.HashAlgo import Hash
 
 class FileIntegrityChecker:
     def __init__(self):
         self.hash_dict = {}
 
     def calculate_file_hash(self, file_path):
-        hash_object = hashlib.md5()
+        hash_object = Hash()
         with open(file_path, 'rb') as file:
             for chunk in iter(lambda: file.read(4096), b''):
                 hash_object.update(chunk)
