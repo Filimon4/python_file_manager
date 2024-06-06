@@ -3,7 +3,6 @@ from PySide6.QtWidgets import QMessageBox
 
 class MessageDialog:
     def __init__(self, app):
-
         self.parent = app
 
     def question(self, title, message):

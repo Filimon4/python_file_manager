@@ -3,6 +3,7 @@ import shutil
 
 from modules.dialogs import FolderSelectorDialog
 from modules.security.HashAlgo import Hash
+from modules.FileIntegrityChecker import FileIntegrityChecker as FICheck
 
 from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog
 from PySide6.QtCore import QDir, QFile
@@ -89,18 +90,19 @@ class FileOperations:
                 counter += 1
         return counter
 
-    # * Расчёт хэша
+    # Расчёт хэша
     def paste(self):
         willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
         if not willPaste == QMessageBox.StandardButton.Yes: return
 
         for file in self.app.savedFiles:
-            filePath = self.app.FileS.engine.filePath(file)
-            fileName = self.app.FileS.engine.fileName(file)
+            fromPath = self.app.FileS.engine.filePath(file)
+            fromName = self.app.FileS.engine.fileName(file)
+            toPath = f"{self.app.currentDir}/{fromName} Copy"
 
-            hash1 = self.getAutoHash(filePath)
-            toPath = f"{self.app.currentDir}/{fileName} Copy"
+            integrity = FICheck()
             if self.app.FileS.engine.fileInfo(file).isDir():
+
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
 
@@ -125,12 +127,14 @@ class FileOperations:
                 else:
                     shutil.copy2(filePath, toPath)
 
-            hash2 = self.getAutoHash(toPath)
-            print(toPath)
-            if hash1 and hash2 and hash1 == hash2:
-                print("The files are the save")
+
+            checkIntegrity = integrity.compare_two(fromPath, toPath)
+            print(checkIntegrity)
+            if checkIntegrity:
+                self.app.Notif.info("Соханность файла", "Файл успешно вставлен без потерь содержимого")
             else:
-                print("Error file itegrity is in dunger")
+                self.app.Notif.info("Сохранность файла", "Целостность файла при перемещении была нарушено")
+                # Notif.critical
 
 
         if self.cut_files == True:
@@ -167,7 +171,7 @@ class FileOperations:
                     file_integrity += file_hash
         return file_integrity
 
-    # * Расчёт хэша
+    # Расчёт хэша
     def move(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:
@@ -179,7 +183,9 @@ class FileOperations:
                 fileName = self.app.FileS.engine.fileName(file)
                 fromPath = self.app.FileS.engine.filePath(file)
 
-                hash1 = self.getAutoHash(fromPath)
+                integrity = FICheck()
+                integrity.addFile(fromPath)
+                # hash1 = self.getAutoHash(fromPath)
 
                 toPath = f"{selected_directory}/{fileName}"
 
@@ -192,19 +198,19 @@ class FileOperations:
 
                 if willMove == QMessageBox.StandardButton.Yes:
                     self.move_file(fromPath, toPath)
-
-                    hash2 = self.getAutoHash(toPath)
-                    if hash1 and hash2 and hash1 == hash2:
-                        print("The files are the save")
+                    integrityResuilt = integrity.compare_with(fromPath, toPath)
+                    if integrityResuilt:
+                        self.app.Notif.info("Соханность файла", "Файл успешно вставлен без потерь содержимого")
                     else:
-                        print("Error file itegrity is in dunger")
+                        self.app.Notif.info("Сохранность файла", "Целостность файла при перемещении была нарушено")
 
     def rename(self):
         file = self.app.FileV.getSingleSelectedFile()
         if file:
             itemPath = self.app.FileS.engine.filePath(file)
+            itemName = self.app.FileS.engine.fileName(file)
             item = QFile(itemPath)
-            fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal)
+            fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal, text = itemName)
             filePath = f"{self.app.currentDir}/{fileName}"
             if item.rename(filePath):
                 print("New file name")

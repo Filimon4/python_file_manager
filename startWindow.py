@@ -84,7 +84,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.currentDir = dir
         self.FileV.update_move_btn()
         self.FileV.tree.clearSelection()
-        ###
+        
         self.FileS.engine.setRootPath(dir)
         # print(self.FileS.engine.rootPath())
 
