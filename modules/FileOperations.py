@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 from modules.dialogs import FolderSelectorDialog
 from modules.security.HashAlgo import Hash
@@ -22,27 +23,42 @@ class FileOperations:
         return ciphertext
 
     def newFolder(self):
-        folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal)
+        folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal, text="Новая папка")
+        if not folderName.strip():
+            folderName = "Новая папка"
+            
+        clearName = ''
+        invalidChars = '<>:"/\\|?*'
+        for i in folderName:
+            if not i in invalidChars:
+                clearName += i
+        folderName = clearName
+        
         if ok and folderName:
             counter = self.getNumberOfSameName(self.app.currentDir, folderName)
+            print(counter)
             if counter > 0:
-                QDir(self.app.currentDir).mkdir(f"{folderName} Copy({counter})")
+                QDir(self.app.currentDir).mkdir(f"{folderName} ({counter})")
             else:
                 QDir(self.app.currentDir).mkdir(f"{folderName}")
 
     def newFile(self):
-        fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal)
+        fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal, text="Новый файл.txt")
         if ok:
             file = f"{self.app.currentDir}/{fileName}"
             fileEntities = fileName.split('.')
+            print(fileEntities, len(fileEntities))
             counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
             if counter > 0:
                 if len(fileEntities) == 2:
-                    file = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter}).{fileEntities[1]}"
+                    file = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).{fileEntities[1]}"
                 else:
-                    file = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter})"
+                    file = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).txt"
             else:
-                file = f"{self.app.currentDir}/{fileName}"
+                if len(fileEntities) == 2:
+                    file = f"{self.app.currentDir}/{fileName}.{fileEntities[1]}"
+                else:
+                    file = f"{self.app.currentDir}/{fileName}.txt"
             with open(file, "w") as file:
                 pass
 
@@ -83,12 +99,16 @@ class FileOperations:
 
     def getNumberOfSameName(self, filePath, fileName):
         files = os.listdir(filePath)
-        counter = 0
 
-        for f in files:
-            if fileName in f or f.startswith(fileName):
-                counter += 1
-        return counter
+        print(fileName)
+        name_pattern_copy = re.compile(f"{fileName}" + r' (\(\d+\))?$')
+        name_pattern = re.compile(f'{fileName}$')
+
+        count = 0
+        for item in files:
+            if name_pattern.match(item) or name_pattern_copy.match(item):
+                count += 1
+        return count
 
     # Расчёт хэша
     def paste(self):
@@ -98,7 +118,7 @@ class FileOperations:
         for file in self.app.savedFiles:
             fromPath = self.app.FileS.engine.filePath(file)
             fromName = self.app.FileS.engine.fileName(file)
-            toPath = f"{self.app.currentDir}/{fromName} Copy"
+            toPath = f"{self.app.currentDir}/{fromName}"
 
             integrity = FICheck()
             if self.app.FileS.engine.fileInfo(file).isDir():
@@ -108,7 +128,7 @@ class FileOperations:
 
                 counter = self.getNumberOfSameName(self.app.currentDir, fileName)
                 if counter > 0:
-                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} Copy({counter})")
+                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
                 else:
                     shutil.copytree(filePath, toPath)
             elif self.app.FileS.engine.fileInfo(file).isFile():
@@ -119,10 +139,10 @@ class FileOperations:
                 counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
                 if counter > 0:
                     if len(fileEntities) == 2:
-                        toPath = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter}).{fileEntities[1]}"
+                        toPath = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).{fileEntities[1]}"
                         shutil.copy2(filePath, toPath)
                     else:
-                        toPath = f"{self.app.currentDir}/{fileEntities[0]} Copy({counter})"
+                        toPath = f"{self.app.currentDir}/{fileEntities[0]} ({counter})"
                         shutil.copy2(filePath, toPath)
                 else:
                     shutil.copy2(filePath, toPath)
@@ -209,10 +229,9 @@ class FileOperations:
         if file:
             itemPath = self.app.FileS.engine.filePath(file)
             itemName = self.app.FileS.engine.fileName(file)
-            item = QFile(itemPath)
             fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal, text = itemName)
             filePath = f"{self.app.currentDir}/{fileName}"
-            if item.rename(filePath):
+            if QFile(itemPath).rename(itemPath, filePath):
                 print("New file name")
             else:
                 print("Cannot rename file")

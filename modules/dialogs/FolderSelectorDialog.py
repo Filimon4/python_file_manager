@@ -26,7 +26,7 @@ class FolderSelectorDialog(QDialog):
         for i in self.currentDir.split('/'):
             path += f'{i}/'
             self.tree_view.expand(self.model.index(path))
-        self.folder_name_line_edit.setText(self.currentDir)
+        self.tree_view.setColumnWidth(0, 200)
         
         self.ok_button = QPushButton("Ок")
         self.ok_button.clicked.connect(self.accept)

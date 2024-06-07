@@ -15,6 +15,7 @@ from modules import FileOperations, FileSystem, FileView, Disks, FileEncrypt, Fi
 from modules.dialogs import TextEditorDialog, MessageDialog
 # -- -- -- --
 
+
 class FileExplorerApp(QMainWindow, Ui_MainWindow):
     treeClicked_Signal = Signal((QMouseEvent))
     rendeRoot_Signal = Signal((str))
