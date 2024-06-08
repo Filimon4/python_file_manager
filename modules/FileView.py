@@ -20,9 +20,7 @@ class FileView(QWidget):
         super().__init__()
 
         self.app = app
-
-        self.last_move = []
-        self.next_move = []
+        
         self.moves = {
             "steps": [],
             "index": 0,
