@@ -23,6 +23,10 @@ class FileView(QWidget):
 
         self.last_move = []
         self.next_move = []
+        self.moves = {
+            "steps": [],
+            "index": 0,
+        }
 
         self.tree_ui = self.app.ui.treeView
 
@@ -71,6 +75,11 @@ class FileView(QWidget):
         else:
             return None
 
+
+    def update_steps(self, currentDir):
+        self.moves["steps"] = [i for i in currentDir.split('/') if i ]
+        self.moves["index"] = len(self.moves["steps"]) - 1
+
     def parent(self):
         dirs = self.app.currentDir.split('/')
 
@@ -80,52 +89,46 @@ class FileView(QWidget):
             path = '/'.join(dirs[0:len(dirs)-1])
             self.app.rendeRoot_Signal.emit(path)
 
-
     def undo(self):
-        if (len(self.last_move) == 0): return
-        last = self.last_move.pop(0)
-        currentDir = self.app.currentDir
-        if (last is currentDir):
-            if (not (currentDir in self.last_move) and not(currentDir in self.next_move)):
-                self.next_move.insert(0, currentDir)
-            if (not (last in self.next_move)):
-                self.next_move.insert(0, last)
-            last = self.last_move.pop(0)
-        if (not (currentDir in self.last_move) and not(currentDir in self.next_move)):
-            self.next_move.insert(0, currentDir)
-        if (not (last in self.next_move)):
-            self.next_move.insert(0, last)
-        self.app.rendeRoot_Signal.emit(last)
+        prevHop = self.moves["index"]-1
+        if prevHop <= 0:
+            prevHop = 0
+        lastStep = '/'.join([i for i in self.moves['steps'][0:self.moves['index']]])
+        self.moves["index"] = prevHop
+        print(lastStep)
+
+        self.app.renderVirtualRoot_Signal.emit(lastStep)
+
+        
 
     def redo(self):
-        if (len(self.next_move) == 0): return
-        next = self.next_move.pop(0)
-        currentDir = self.app.currentDir
-        if (next is currentDir):
-            if (not (next in self.last_move)):
-                self.last_move.insert(0, next)
-            next = self.next_move.pop(0)
-        if (not (next in self.last_move)):
-            self.last_move.insert(0, next)
-        self.app.rendeRoot_Signal.emit(next)
+        nextHop = self.moves["index"]+1
+        if nextHop >= len(self.moves["steps"])-1:
+            nextHop = len(self.moves["steps"])-1
+        self.moves["index"] = nextHop
+        nextStep = '/'.join([i for i in self.moves['steps'][0:self.moves['index']+1]])
+        print("NexStep: ", nextStep)
+
+        self.app.renderVirtualRoot_Signal.emit(nextStep)
+
 
     def update_move_btn(self):
-        len_next = len(self.next_move)
-        len_last = len(self.last_move)
+        self.levelUp_btn.setEnabled(False)
+        self.undo_btn.setEnabled(False)
+        self.redo_btn.setEnabled(False)
 
-        if (len_next == 0):
-            self.redo_btn.setEnabled(False)
-        else:
-            self.redo_btn.setEnabled(True)
-
-        if (len_last == 0):
-            self.undo_btn.setEnabled(False)
-        else:
+        lenSteps = len(self.moves['steps'])
+        if lenSteps == 0:
+            pass
+        elif lenSteps == 1:
             self.undo_btn.setEnabled(True)
-
-        if (self.app.currentDir == ''):
-            self.levelUp_btn.setEnabled(False)
-        else:
+            self.levelUp_btn.setEnabled(True)
+        elif lenSteps > 0 and self.moves['index']+1 < lenSteps:
+            self.levelUp_btn.setEnabled(True)
+            self.undo_btn.setEnabled(True)
+            self.redo_btn.setEnabled(True)
+        elif lenSteps == self.moves['index']+1:
+            self.undo_btn.setEnabled(True)
             self.levelUp_btn.setEnabled(True)
 
     def resizeEvent(self, event):

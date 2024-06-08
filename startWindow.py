@@ -21,6 +21,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     rendeRoot_Signal = Signal((str))
     setSavedFiles_Signal = Signal((list))
     setCurrentFolder_Signal = Signal((str))
+    renderVirtualRoot_Signal = Signal((str))
     def __init__(self):
         super().__init__()
 
@@ -33,6 +34,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         # Signals
         self.treeClicked_Signal[QMouseEvent].connect(self.treeClicked)
         self.rendeRoot_Signal[str].connect(self.renderNewRoot)
+        self.renderVirtualRoot_Signal[str].connect(self.renderVirtualRoot)
         self.setSavedFiles_Signal[list].connect(self.setSavedFiles)
         self.setCurrentFolder_Signal[str].connect(self.setCurrentFolder)
 
@@ -68,10 +70,9 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     @Slot(QMouseEvent)
     def treeClicked(self, index):
         file = self.FileS.engine.filePath(index)
-        # file = self.FileS.engine.filePath(self.FileV.proxyModel.mapToSource(index))
         if os.path.isdir(file):
             self.filePath.setText(f"{file}")
-            self.FileV.last_move.insert(0, self.currentDir)
+            # self.FileV.last_move.insert(0, self.currentDir)
             self.renderNewRoot(file)
         elif os.path.isfile(file):
             window = TextEditorDialog(file)
@@ -81,13 +82,26 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     def renderNewRoot(self, dir):
         self.filePath.setText(f"{dir}")
         dirIndex = self.FileS._engine.index(dir)
-        self.FileV.rootIndex = dirIndex
-        self.currentDir = dir
-        self.FileV.update_move_btn()
-        self.FileV.tree.clearSelection()
         
         self.FileS.engine.setRootPath(dir)
+        self.FileV.rootIndex = dirIndex
+        self.currentDir = dir
+        
+        self.FileV.tree.clearSelection()
+        self.FileV.update_steps(self.currentDir)
+        self.FileV.update_move_btn()
         # print(self.FileS.engine.rootPath())
+
+    @Slot(str)
+    def renderVirtualRoot(self, dir):
+        self.filePath.setText(f"{dir}")
+        dirIndex = self.FileS._engine.index(dir)
+
+        self.FileS.engine.setRootPath(dir)
+        self.FileV.rootIndex = dirIndex
+
+        self.FileV.tree.clearSelection()
+        self.FileV.update_move_btn()
 
     @Slot(list)
     def setSavedFiles(self, files):
