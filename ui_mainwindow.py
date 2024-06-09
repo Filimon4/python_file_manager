@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QHeaderVi
     QLabel, QMainWindow, QMenu, QMenuBar,
     QPushButton, QSizePolicy, QStatusBar, QToolBar,
     QTreeView, QVBoxLayout, QWidget)
-import rc_icons
+import icons_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

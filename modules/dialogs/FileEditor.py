@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextEdit, QPushButton, QFileDialog, QFontDialog, QMessageBox
-from PySide6.QtGui import QFont, QTextCursor
+from PySide6.QtGui import QFont, QTextCursor, QIcon
 from PySide6.QtCore import QFile, QIODevice, QTextStream
 
 class TextEditorDialog(QDialog):
@@ -9,12 +9,15 @@ class TextEditorDialog(QDialog):
 
         self.filePath = filePath
 
-        self.setWindowTitle("Text Editor")
+        app_icon = QIcon('app_icon.png')
+        self.setWindowIcon(app_icon)
+
+        self.setWindowTitle("Редактор файлов")
         self.setGeometry(100, 100, 600, 400)
 
         self.textEdit = QTextEdit()
-        self.saveButton = QPushButton("Save")
-        self.changeFontButton = QPushButton("Change Font")
+        self.saveButton = QPushButton("Сохранить")
+        self.changeFontButton = QPushButton("Изменить шрифт")
 
         self.saveButton.clicked.connect(self.save)
         self.changeFontButton.clicked.connect(self.changeFont)

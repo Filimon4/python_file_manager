@@ -47,7 +47,6 @@ class FileOperations:
         if ok:
             file = f"{self.app.currentDir}/{fileName}"
             fileEntities = fileName.split('.')
-            print(fileEntities, len(fileEntities))
             counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
             if counter > 0:
                 if len(fileEntities) == 2:
@@ -56,9 +55,9 @@ class FileOperations:
                     file = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).txt"
             else:
                 if len(fileEntities) == 2:
-                    file = f"{self.app.currentDir}/{fileName}.{fileEntities[1]}"
+                    file = f"{self.app.currentDir}/{fileEntities[0]}.{fileEntities[1]}"
                 else:
-                    file = f"{self.app.currentDir}/{fileName}.txt"
+                    file = f"{self.app.currentDir}/{fileEntities[0]}.txt"
             with open(file, "w") as file:
                 pass
 

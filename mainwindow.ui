@@ -22,6 +22,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <property name="styleSheet">
    <string notr="true">#centralwidget {
 	background-color: rgb(255, 255, 255);
@@ -45,7 +48,11 @@ QPushButton {
 	padding: 5px;
 	border-radius: 5px;
 }
-            
+
+QMainWindow {
+	background-color: rgb(255, 255, 255);
+}
+           
 QPushButton:hover {
 	background-color: #87CEFA; /* Light blue on hover */
 }

@@ -1,9 +1,13 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QTreeView,QFileSystemModel, QPushButton
 from PySide6.QtCore import QDir, QFileInfo
+from PySide6.QtGui import QIcon
 
 class FolderSelectorDialog(QDialog):
     def __init__(self, currentDir):
         super(FolderSelectorDialog, self).__init__()
+
+        app_icon = QIcon('app_icon.png')
+        self.setWindowIcon(app_icon)
 
         layout = QVBoxLayout()
         self.currentDir = currentDir
@@ -48,6 +52,7 @@ class FolderSelectorDialog(QDialog):
             self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
 
             self.folder_name_line_edit.setText(selected_directory)
+            print(selected_directory, self.currentDir)
             if selected_directory == self.currentDir:
                 self.ok_button.setEnabled(False)
             else:
