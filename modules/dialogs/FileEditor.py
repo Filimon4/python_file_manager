@@ -1,7 +1,10 @@
+import os
 import sys
-from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextEdit, QPushButton, QFileDialog, QFontDialog, QMessageBox
+import codecs
+from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextEdit, QPushButton, QFileDialog, QFontDialog, QMessageBox, QProgressDialog
 from PySide6.QtGui import QFont, QTextCursor, QIcon
-from PySide6.QtCore import QFile, QIODevice, QTextStream
+from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt
+from modules.dialogs.ProgressBar import ProgressBar
 
 class TextEditorDialog(QDialog):
     def __init__(self, filePath=None):
@@ -16,6 +19,8 @@ class TextEditorDialog(QDialog):
         self.setGeometry(100, 100, 600, 400)
 
         self.textEdit = QTextEdit()
+        self.textEdit.setFontFamily("Consolas")
+        self.textEdit.setFont("Regular")
         self.saveButton = QPushButton("Сохранить")
         self.changeFontButton = QPushButton("Изменить шрифт")
 
@@ -33,8 +38,28 @@ class TextEditorDialog(QDialog):
             self.loadFile()
 
     def loadFile(self):
-        with open(self.filePath, "r") as f:
-            self.textEdit.setPlainText(f.read())
+
+        fileSize = os.path.getsize(self.filePath)
+        print(fileSize)
+
+        p = QProgressDialog("Чтение файла", "Закрыть", 0, fileSize, self)
+        p.setWindowModality(Qt.WindowModal)
+        p.setMinimumDuration(0)
+        p.setValue(0)
+
+        with open(self.filePath, "r", errors='replace') as f:
+            # self.textEdit.setPlainText(f.read())
+            chunk_size = 1024
+            while True:
+                if p.wasCanceled():
+                    break
+                chunk = f.read(chunk_size)
+                if not chunk:
+                    break
+                self.textEdit.insertPlainText(chunk)
+                p.setValue(p.value() + chunk_size)
+                
+        p.close()
 
     def save(self):
         if not self.filePath:

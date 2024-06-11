@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QPushButton, QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from PySide6.QtCore import QDir
 from modules.ui import DiskButton
 

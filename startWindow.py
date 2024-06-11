@@ -1,20 +1,20 @@
 import os
+import time
 
 from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox
 )
 from PySide6.QtCore import (
-    QSize, Signal, Slot
+    QSize, Signal, Slot, QTimer
 )
 from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent, QIcon
 from ui_mainwindow import Ui_MainWindow
 
 # Main logic modules
 from modules import FileOperations, FileSystem, FileView, Disks, FileEncrypt, FileDecrypt, ActionsApp
-from modules.dialogs import TextEditorDialog, MessageDialog
+from modules.dialogs import TextEditorDialog, MessageDialog, ProgressBar
 # -- -- -- --
-
 
 class FileExplorerApp(QMainWindow, Ui_MainWindow):
     treeClicked_Signal = Signal((QMouseEvent))
@@ -22,6 +22,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     setSavedFiles_Signal = Signal((list))
     setCurrentFolder_Signal = Signal((str))
     renderVirtualRoot_Signal = Signal((str))
+    updateDir_Signal = Signal()
     def __init__(self):
         super().__init__()
 
@@ -37,6 +38,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.renderVirtualRoot_Signal[str].connect(self.renderVirtualRoot)
         self.setSavedFiles_Signal[list].connect(self.setSavedFiles)
         self.setCurrentFolder_Signal[str].connect(self.setCurrentFolder)
+        self.updateDir_Signal.connect(self.updateDir)
 
         # ui.ui
         self.ui = Ui_MainWindow()
@@ -110,6 +112,10 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     @Slot(str)
     def setCurrentFolder(self, dir):
         self.currentDir = dir
+
+    @Slot()
+    def updateDir(self):
+        self.FileS.engine.setRootPath(self.currentDir)
 
     def resizeEvent(self, event):
         self.FileV.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))

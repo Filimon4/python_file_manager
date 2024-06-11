@@ -1,13 +1,14 @@
 import os
 import shutil
 import re
+import pathlib
 
 from modules.dialogs import FolderSelectorDialog
 from modules.security.HashAlgo import Hash
 from modules.FileIntegrityChecker import FileIntegrityChecker as FICheck
 
-from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog
-from PySide6.QtCore import QDir, QFile
+from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog, QProgressDialog
+from PySide6.QtCore import QDir, QFile, Qt
 
 class FileOperations:
 
@@ -23,6 +24,7 @@ class FileOperations:
         return ciphertext
 
     def newFolder(self):
+        self.app.updateDir_Signal.emit()
         folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal, text="Новая папка")
         if not folderName.strip():
             folderName = "Новая папка"
@@ -35,7 +37,7 @@ class FileOperations:
         folderName = clearName
         
         if ok and folderName:
-            counter = self.getNumberOfSameName(self.app.currentDir, folderName)
+            counter = self.getNumberOfSameName(self.app.currentDir, folderName, folder=True)
             print(counter)
             if counter > 0:
                 QDir(self.app.currentDir).mkdir(f"{folderName} ({counter})")
@@ -43,19 +45,26 @@ class FileOperations:
                 QDir(self.app.currentDir).mkdir(f"{folderName}")
 
     def newFile(self):
+        self.app.updateDir_Signal.emit()
         fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal, text="Новый файл.txt")
         if ok:
             file = f"{self.app.currentDir}/{fileName}"
             fileEntities = fileName.split('.')
-            counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
+            if len(fileEntities) >= 2:
+                counter = self.getNumberOfSameName(self.app.currentDir, '.'.join(fileEntities[0:-1]), fileEntities[-1])
+            else:
+                counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0], 'txt')
+            if counter == 'denied':
+                self.app.Notif.info('Название файла', 'Попробуйте выбрать другое имя файла')
+                return
             if counter > 0:
-                if len(fileEntities) == 2:
-                    file = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).{fileEntities[1]}"
+                if len(fileEntities) >= 2:
+                    file = f"{self.app.currentDir}/{'.'.join(fileEntities[0:-1])} ({counter}).{fileEntities[-1]}"
                 else:
                     file = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).txt"
             else:
-                if len(fileEntities) == 2:
-                    file = f"{self.app.currentDir}/{fileEntities[0]}.{fileEntities[1]}"
+                if len(fileEntities) >= 2:
+                    file = f"{self.app.currentDir}/{'.'.join(fileEntities[0:-1])}.{fileEntities[-1]}"
                 else:
                     file = f"{self.app.currentDir}/{fileEntities[0]}.txt"
             with open(file, "w") as file:
@@ -96,10 +105,20 @@ class FileOperations:
             self.cut_files = True
             self.app.setSavedFiles_Signal.emit(files)
 
-    def getNumberOfSameName(self, filePath, fileName):
+    def getNumberOfSameName(self, filePath, fileName, fileExt=None, folder=False):
+        print('ObjectName: ', fileName, "FileExt: ", fileExt)
         files = os.listdir(filePath)
+        fileSameExt = []
 
-        print(fileName)
+        if fileExt:
+            for f in files:
+                fileEntyties = f.split('.')
+                if len(fileEntyties) >= 2:
+                    if fileEntyties[-1] == fileExt:
+                        fileSameExt.append('.'.join(fileEntyties[0:-1]))
+            files = fileSameExt
+        print('Check objects: ', files)
+
         name_pattern_copy = re.compile(f"{fileName}" + r' (\(\d+\))?$')
         name_pattern = re.compile(f'{fileName}$')
 
@@ -107,50 +126,94 @@ class FileOperations:
         for item in files:
             if name_pattern.match(item) or name_pattern_copy.match(item):
                 count += 1
+                
+        if count >= 1:
+            def getObjPath(count):
+                objPath = None
+                if folder:
+                    objPath = f"{filePath}/{fileName} ({count})"
+                else:
+                    objPath = f"{filePath}/{fileName} ({count}).{fileExt}"
+                return objPath
+            
+            while pathlib.Path(getObjPath(count)).exists():
+                try:
+                    if count > 8:
+                        count = 'denied'
+                        break
+                    count += 1
+                except:
+                    break
+        
         return count
 
     # Расчёт хэша
     def paste(self):
+        self.app.updateDir_Signal.emit()
         willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
         if not willPaste == QMessageBox.StandardButton.Yes: return
+
+        # p = QProgressDialog("Копирование файлов", None, 0, len(self.app.savedFiles), self.app)
+        # p.setWindowModality(Qt.WindowModal)
+        # p.setMinimumDuration(0)
+        # p.setValue(0)
 
         for file in self.app.savedFiles:
             fromPath = self.app.FileS.engine.filePath(file)
             fromName = self.app.FileS.engine.fileName(file)
             toPath = f"{self.app.currentDir}/{fromName}"
 
-            integrity = FICheck()
-            if self.app.FileS.engine.fileInfo(file).isDir():
+            if self.app.FileS.engine.fileInfo(file).isDir():    
 
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
 
-                counter = self.getNumberOfSameName(self.app.currentDir, fileName)
+                def copyTree(src, dst):
+                    try:
+                        shutil.copytree(src, dst)
+                    except shutil.SameFileError:
+                        print('## ## ## SAME FILE ERROR ## ## ##')
+                    except FileExistsError:
+                        print('## ## ## SAME FILE ERROR ## ## ##')
+
+                counter = self.getNumberOfSameName(self.app.currentDir, fileName, folder=True)
                 if counter > 0:
-                    shutil.copytree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
+                    copyTree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
                 else:
-                    shutil.copytree(filePath, toPath)
+                    copyTree(filePath, toPath)
             elif self.app.FileS.engine.fileInfo(file).isFile():
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
 
+                def copyTwo(src, dst):
+                    try:
+                        shutil.copy2(src, dst)
+                    except shutil.SameFileError:
+                        print("## ## ## SAME FILE ERROR ## ## ##")
+                    except FileExistsError:
+                        print('## ## ## SAME FILE ERROR ## ## ##')
+
                 fileEntities = fileName.split('.')
-                counter = self.getNumberOfSameName(self.app.currentDir, fileEntities[0])
+                if len(fileEntities) >= 2:
+                    counter = self.getNumberOfSameName(self.app.currentDir, '.'.join(fileEntities[0:-1]), fileEntities[-1])
+                else:
+                    counter = self.getNumberOfSameName(self.app.currentDIr, fileEntities[0])
                 if counter > 0:
-                    if len(fileEntities) == 2:
-                        toPath = f"{self.app.currentDir}/{fileEntities[0]} ({counter}).{fileEntities[1]}"
-                        shutil.copy2(filePath, toPath)
+                    if len(fileEntities) >= 2:
+                        toPath = f"{self.app.currentDir}/{'.'.join(fileEntities[0:-1])} ({counter}).{fileEntities[-1]}"
+                        copyTwo(filePath, toPath)
                     else:
                         toPath = f"{self.app.currentDir}/{fileEntities[0]} ({counter})"
-                        shutil.copy2(filePath, toPath)
+                        copyTwo(filePath, toPath)
                 else:
-                    shutil.copy2(filePath, toPath)
+                    copyTwo(filePath, toPath)
 
+            # p.setValue(p.value() + 1)
 
-            checkIntegrity = integrity.compare_two(fromPath, toPath)
+            checkIntegrity = FICheck().compare_two(fromPath, toPath)
             print(checkIntegrity)
             if checkIntegrity:
-                self.app.Notif.info("Соханность файла", "Файл успешно вставлен без потерь содержимого")
+                self.app.Notif.info("Сохранность файла", "Файл успешно вставлен без потерь содержимого")
             else:
                 self.app.Notif.info("Сохранность файла", "Целостность файла при перемещении была нарушено")
                 # Notif.critical
@@ -158,6 +221,8 @@ class FileOperations:
 
         if self.cut_files == True:
             self.delete_no_sub(saved=True)
+
+        # p.close()
 
     def move_file(self, fromPath, toPath):
         if fromPath and toPath:
@@ -224,14 +289,30 @@ class FileOperations:
                         self.app.Notif.info("Сохранность файла", "Целостность файла при перемещении была нарушено")
 
     def rename(self):
+        self.app.updateDir_Signal.emit()
         file = self.app.FileV.getSingleSelectedFile()
         if file:
+
             itemPath = self.app.FileS.engine.filePath(file)
             itemName = self.app.FileS.engine.fileName(file)
+
             fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal, text = itemName)
-            filePath = f"{self.app.currentDir}/{fileName}"
+
+            fileEntyties = fileName.split('.')
+            if len(fileEntyties) >= 2:
+                counter = self.getNumberOfSameName(self.app.currentDir, '.'.join(fileEntyties[0:-1]), fileEntyties[-1])
+                if counter > 0:
+                    filePath = f'{self.app.currentDir}'+"/"+'.'.join(fileEntyties[0:-1])+' '+f"({counter})"+"."+fileEntyties[-1]
+                else:
+                    filePath = f'{self.app.currentDir}'+"/"+'.'.join(fileEntyties[0:-1])+"."+fileEntyties[-1]
+            else:
+                counter = self.getNumberOfSameName(self.app.currentDir, fileEntyties[0])
+                if counter > 0:
+                    filePath = f'{self.app.currentDir}'+"/"+fileEntyties[0]+' '+f"({counter})"
+                else:
+                    filePath = f'{self.app.currentDir}'+"/"+fileEntyties[0]
+
             if QFile(itemPath).rename(itemPath, filePath):
                 print("New file name")
             else:
                 print("Cannot rename file")
-

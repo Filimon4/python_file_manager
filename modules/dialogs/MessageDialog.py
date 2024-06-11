@@ -1,5 +1,6 @@
 
 from PySide6.QtWidgets import QMessageBox
+from PySide6.QtCore import Qt
 
 class MessageDialog:
     def __init__(self, app):

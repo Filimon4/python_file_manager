@@ -12,14 +12,23 @@ class FileIntegrityChecker:
 
     def calculate_file_hash(self, file_path):
         hash_object = Hash()
-        with open(file_path, 'rb') as file:
-            for chunk in iter(lambda: file.read(4096), b''):
-                hash_object.update(chunk)
+        try:
+            with open(file_path, 'rb') as file:
+                for chunk in iter(lambda: file.read(4096), b''):
+                    hash_object.update(chunk)
+        except PermissionError:
+            print('PERSMISSION ERROR')
+            return 'denied'
+        finally:
+            pass
         return hash_object.hexdigest()
 
     def compare_two(self, source1, source2):
         source1_hash = self.calculate_file_hash(source1)
         source2_hash = self.calculate_file_hash(source2)
+
+        if source1_hash == 'denied' or source2_hash == 'denied':
+            return True
 
         if source1_hash == source2_hash:
             return True
@@ -28,7 +37,6 @@ class FileIntegrityChecker:
 
     def compare_all(self):
         pass
-
 
     def compare_with(self, source, index):
         current_hash = self.calculate_file_hash(index)
