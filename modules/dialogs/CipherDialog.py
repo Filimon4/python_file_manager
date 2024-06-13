@@ -12,21 +12,35 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QCheckBox
 )
+from modules.dialogs.FolderSelectorDialog import FileSelectorDialog
 
 class CipherDialog(QDialog):
-    def __init__(self, selectedFile='', parentOfSelectedFile=''):
+    def __init__(self, app, selectedFile='', parentOfSelectedFile='', inputExtenstion=''):
         super().__init__()
         app_icon = QIcon('app_icon.png')
         self.setWindowIcon(app_icon)
 
         self.selectedFile = selectedFile
         self.parentOfSelected = parentOfSelectedFile
+        self.inputExtenstion = inputExtenstion
+        self.app = app
 
         self.fileSelected = self.selectedFile.split('/')[-1]
 
         self.file_to_cipher_edit = QLineEdit()
-        if self.selectedFile:
+
+        if inputExtenstion:
+            selectedFileEntyties = self.selectedFile.split('.')
+            if len(selectedFileEntyties) >= 2:
+                if selectedFileEntyties[-1] == inputExtenstion:
+                    self.file_to_cipher_edit.setText(self.selectedFile)
+                else:
+                    self.file_to_cipher_edit.setText(f"{self.parentOfSelected}/")
+            else:
+                self.file_to_cipher_edit.setText(f"{self.parentOfSelected}/")
+        else:
             self.file_to_cipher_edit.setText(self.selectedFile)
+
         self.output_file_edit = QLineEdit()
         if self.parentOfSelected:
             self.output_file_edit.setText(f"{self.parentOfSelected}/")
@@ -120,12 +134,25 @@ class CipherDialog(QDialog):
 
 
     def browse_file_to_cipher(self):
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        if file_dialog.exec():
-            selected_files = file_dialog.selectedFiles()
+        # file_dialog = QFileDialog()
+        # file_dialog.setFileMode(QFileDialog.ExistingFile)
+        file_dialog = FileSelectorDialog(self.app.currentDir)
+        result = file_dialog.exec_()
+        if result == QDialog.Accepted:
+            selected_files = file_dialog.selectedFile
             if selected_files:
-                self.file_to_cipher_edit.setText(selected_files[0])
+                if self.inputExtenstion:
+                    selectedFileEntyties = self.selectedFile.split('.')
+                    if len(selectedFileEntyties) >= 2:
+                        if selectedFileEntyties[-1] == self.inputExtenstion:
+                            self.file_to_cipher_edit.setText(selected_files[0])
+                        else:
+                            self.file_to_cipher_edit.setText(f"{self.parentOfSelected}/")
+                    else:
+                        self.file_to_cipher_edit.setText(f"{self.parentOfSelected}/")
+                else:
+                    self.file_to_cipher_edit.setText(selected_files[0])
+
 
     def is_file_path_available(self, file_path):
         return not os.path.exists(file_path)
@@ -148,17 +175,17 @@ class CipherDialog(QDialog):
         self.accept()
 
 class EncryptCipherDialog(CipherDialog):
-    def __init__(self, selectedFile='', parentOfSelectedFile=''):
+    def __init__(self, app, selectedFile='', parentOfSelectedFile=''):
         self.OutputTitle = "Пеместить данные в:"
         self.InputTitle = "Зашифровать данные из: "
         self.keysTitle = "Ключ для шифрования"
-        super().__init__(selectedFile, parentOfSelectedFile)
+        super().__init__(app, selectedFile, parentOfSelectedFile)
         self.setWindowTitle("Шифрование файла")
 
 class DecryptCipherDialog(CipherDialog):
-    def __init__(self, selectedFile='', parentOfSelectedFile=''):
+    def __init__(self, app, selectedFile='', parentOfSelectedFile='', inputExtenstion=''):
         self.InputTitle = "Дешифровать данне из"
         self.OutputTitle = "Пеместить данные в:"
         self.keysTitle = "Ключи для дешифрования"
-        super().__init__(selectedFile, parentOfSelectedFile)
+        super().__init__(app, selectedFile, parentOfSelectedFile, inputExtenstion)
         self.setWindowTitle("Дешифровка файла")

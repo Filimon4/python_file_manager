@@ -1,6 +1,74 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QTreeView,QFileSystemModel, QPushButton
-from PySide6.QtCore import QDir, QFileInfo
+from PySide6.QtCore import QDir, QFileInfo, QSortFilterProxyModel, Qt
 from PySide6.QtGui import QIcon
+
+class FilterProxy(QSortFilterProxyModel):
+    def __init__(self, disables=False, parent=None):
+        super().__init__(parent)
+        self._disables = bool(disables)
+
+    def filterAcceptsRow(self, row, parent):
+        index = self.sourceModel().index(row, 0, parent)
+        if not self._disables:
+            return self.matchIndex(index)
+        return index.isValid()
+
+    def matchIndex(self, index):
+        return (self.sourceModel().isDir(index) or
+                super().filterAcceptsRow(index.row(), index.parent()))
+
+    def flags(self, index):
+        flags = super().flags(index)
+        if (self._disables and
+            not self.matchIndex(self.mapToSource(index))):
+            flags &= ~Qt.ItemIsEnabled
+        return flags
+
+class FileSelectorDialog(QDialog):
+    def __init__(self, currentDir):
+        super(FileSelectorDialog, self).__init__()
+
+        app_icon = QIcon('app_icon.png')
+        self.setWindowIcon(app_icon)
+
+        layout = QVBoxLayout()
+        self.currentDir = currentDir
+        self.selectedFile = None
+
+        self.setWindowTitle("Выбор файла")
+
+        self.folder_name_line_edit = QLineEdit()
+        self.folder_name_line_edit.setReadOnly(True)
+        layout.addWidget(self.folder_name_line_edit)
+
+        self.tree_view = QTreeView()
+        layout.addWidget(self.tree_view)
+
+        self.model = QFileSystemModel()
+        self.model.setRootPath(QDir.rootPath())
+        # self.model.setFilter()
+        # self.proxy = QSortFilterProxyModel(self)
+        # self.proxy.setFilterRegularExpression(r'*')
+        # self.proxy.setSourceModel(self.model)
+        self.model.setNameFilters(['*.b64'])
+        self.tree_view.setModel(self.model)
+
+        path = ''
+        for i in self.currentDir.split('/'):
+            path += f'{i}/'
+            self.tree_view.expand(self.model.index(path))
+        self.tree_view.setColumnWidth(0, 200)
+
+        self.ok_button = QPushButton("Ок")
+        self.ok_button.clicked.connect(self.accept)
+        cancel_button = QPushButton("Отмена")
+        cancel_button.clicked.connect(self.reject)
+
+        layout.addWidget(self.ok_button)
+        layout.addWidget(cancel_button)
+
+        self.setLayout(layout)
+
 
 class FolderSelectorDialog(QDialog):
     def __init__(self, currentDir):

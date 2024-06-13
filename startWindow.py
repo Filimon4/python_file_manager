@@ -115,7 +115,12 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def updateDir(self):
+        print(self.FileS.engine.rootPath())
+        self.currentDir = self.FileS.engine.rootPath()
         self.FileS.engine.setRootPath(self.currentDir)
+        self.FileV.rootIndex = self.FileS.engine.index(self.currentDir)
+        self.FileV.update_steps(self.currentDir)
+        self.FileV.update_move_btn()
 
     def resizeEvent(self, event):
         self.FileV.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))

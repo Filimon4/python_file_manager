@@ -19,6 +19,7 @@ class CipherAlgo:
     def feistel_cipher(self, plaintext: bytes, keys: List[int]) -> bytes:
         if not keys:
             return
+        print(plaintext)
         padding_length = 8 - (len(plaintext) % 8)
         plaintext += bytes([padding_length] * padding_length)
 

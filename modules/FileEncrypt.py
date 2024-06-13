@@ -20,9 +20,10 @@ class Encrypt(CipherAlgo):
         if selectedFile:
             filePath = self.app.FileS.engine.filePath(selectedFile)
             fileParentPath = self.app.FileS.engine.filePath(selectedFile.parent())
-        dialog = EncryptCipherDialog(filePath, fileParentPath)
+        dialog = EncryptCipherDialog(self.app, filePath, fileParentPath)
         result = dialog.exec_()
         if result:
+            self.app.updateDir_Signal.emit()
             k1 = int(dialog.k1, 16)
             k2 = int(dialog.k2, 16)
             k3 = int(dialog.k3, 16)
@@ -34,4 +35,5 @@ class Encrypt(CipherAlgo):
             plain_text = base64.b64encode(readBinary)
 
             ciphertext = super().feistel_cipher(plain_text, [k1,k2,k3,k4])
+            print(ciphertext)
             self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)

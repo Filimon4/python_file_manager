@@ -5,7 +5,7 @@ import pathlib
 
 from modules.dialogs import FolderSelectorDialog
 from modules.security.HashAlgo import Hash
-from modules.FileIntegrityChecker import FileIntegrityChecker as FICheck
+from modules.FileIntegrityChecker import FileIntegrityChecker as FICheck, FolderIntegrityChecker as DICheck
 
 from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog, QProgressDialog
 from PySide6.QtCore import QDir, QFile, Qt
@@ -162,11 +162,13 @@ class FileOperations:
             fromPath = self.app.FileS.engine.filePath(file)
             fromName = self.app.FileS.engine.fileName(file)
             toPath = f"{self.app.currentDir}/{fromName}"
+            checkIntegrity = None
 
             if self.app.FileS.engine.fileInfo(file).isDir():    
 
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
+                DICheck().addFolder(filePath)
 
                 def copyTree(src, dst):
                     try:
@@ -181,6 +183,8 @@ class FileOperations:
                     copyTree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
                 else:
                     copyTree(filePath, toPath)
+
+                checkIntegrity = DICheck().compare_two(fromPath, toPath)
             elif self.app.FileS.engine.fileInfo(file).isFile():
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
@@ -208,9 +212,10 @@ class FileOperations:
                 else:
                     copyTwo(filePath, toPath)
 
+                checkIntegrity = FICheck().compare_two(fromPath, toPath)
+
             # p.setValue(p.value() + 1)
 
-            checkIntegrity = FICheck().compare_two(fromPath, toPath)
             print(checkIntegrity)
             if checkIntegrity:
                 self.app.Notif.info("Сохранность файла", "Файл успешно вставлен без потерь содержимого")
