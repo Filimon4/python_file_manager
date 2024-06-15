@@ -3,12 +3,12 @@ import shutil
 import re
 import pathlib
 
-from modules.dialogs import FolderSelectorDialog
+from modules.dialogs import FolderSelectorDialog, MessageDialog
 from modules.security.HashAlgo import Hash
 from modules.FileIntegrityChecker import FileIntegrityChecker as FICheck, FolderIntegrityChecker as DICheck
 
 from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit, QDialog, QProgressDialog
-from PySide6.QtCore import QDir, QFile, Qt
+from PySide6.QtCore import QDir, QFile, Qt, QTranslator
 
 class FileOperations:
 
@@ -25,7 +25,11 @@ class FileOperations:
 
     def newFolder(self):
         self.app.updateDir_Signal.emit()
-        folderName, ok = QInputDialog.getText(self.app, "Ввод", "Название папки: ", QLineEdit.Normal, text="Новая папка")
+        
+        folderName, ok = MessageDialog.input("Ввод", "Название папки: ", default="Новая папка")
+        
+        if not ok: return
+
         if not folderName.strip():
             folderName = "Новая папка"
             
@@ -45,16 +49,17 @@ class FileOperations:
 
     def newFile(self):
         self.app.updateDir_Signal.emit()
-        fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal, text="Новый файл.txt")
-        
-        clearName = ''
-        invalidChars = '<>:"/\\|?*'
-        for i in fileName:
-            if not i in invalidChars:
-                clearName += i
-        fileName = clearName
-        
+        # fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal, text="Новый файл.txt")
+        fileName, ok = MessageDialog.input("Ввод", "Название файла: ")
+        print(fileName, ok)
         if ok:
+            clearName = ''
+            invalidChars = '<>:"/\\|?*'
+            for i in fileName:
+                if not i in invalidChars:
+                    clearName += i
+            fileName = clearName
+
             file = f"{self.app.currentDir}/{fileName}"
             fileEntities = fileName.split('.')
             if len(fileEntities) >= 2:
@@ -88,8 +93,8 @@ class FileOperations:
             items = self.app.FileV.getSelectedFiles()
         if items:
             quest = f"Удалить {len(items)} элементов"
-            willDelete = QMessageBox.question(self.app, "Удаление", quest, QMessageBox.Yes|QMessageBox.No)
-            if willDelete == QMessageBox.StandardButton.Yes:
+            willDelete = MessageDialog.ask("Удаление", quest)
+            if willDelete:
                 for index in items:
                     self.app.FileS.engine.remove(index)
 
@@ -156,8 +161,9 @@ class FileOperations:
     # Расчёт хэша
     def paste(self):
         self.app.updateDir_Signal.emit()
-        willPaste = QMessageBox.question(self.app, "Вставка", "Вставить файлы в текущюю директорию", QMessageBox.Yes|QMessageBox.No)
-        if not willPaste == QMessageBox.StandardButton.Yes: return
+        willPaste = MessageDialog.ask("Вставка", "Вставить файлы в текущюю директорию")
+        
+        if not willPaste: return
 
         # p = QProgressDialog("Копирование файлов", None, 0, len(self.app.savedFiles), self.app)
         # p.setWindowModality(Qt.WindowModal)
@@ -238,9 +244,33 @@ class FileOperations:
 
         # p.close()
 
-    def move_file(self, fromPath, toPath):
-        if fromPath and toPath:
-            shutil.move(fromPath, toPath)
+    def move_file(self, file, pathMove, pathMoveIndex):
+        print(file, pathMove)
+        fileName = self.app.FileS.engine.fileName(file)
+        filePath = self.app.FileS.engine.filePath(file)
+
+        fileIsDir = self.app.FileS.engine.fileInfo(file).isDir()
+        counter = self.getNumberOfSameName(pathMove, fileName, folder=fileIsDir)
+    
+        if pathMove and fileName:
+            if counter > 0:
+                if fileIsDir:
+                    shutil.move(filePath, f"{pathMove}/{fileName} ({counter})")
+                else:
+                    fileEntyties = fileName.split('.')
+                    if len(fileEntyties) >= 2:
+                        shutil.move(filePath, f"{pathMove}/{'.'.join(fileEntyties[0:-1])} ({counter}).{fileEntyties[-1]}")
+                    else:
+                        shutil.move(filePath, f"{pathMove}/{fileEntyties[0]} ({counter})")
+            else:
+                if fileIsDir:
+                    shutil.move(filePath, f"{pathMove}/{fileName}")
+                else:
+                    fileEntyties = fileName.split('.')
+                    if len(fileEntyties) >= 2:
+                        shutil.move(filePath, f"{pathMove}/{'.'.join(fileEntyties[0:-1])}.{fileEntyties[-1]}")
+                    else:
+                        shutil.move(filePath, f"{pathMove}/{fileEntyties[0]}")
 
     def getAutoHash(self, path):
         if not (path and os.path.exists(path)): return None
@@ -278,24 +308,24 @@ class FileOperations:
 
             if result == QDialog.Accepted:
                 selected_directory = self.app.FileS.engine.filePath(dia.tree_view.currentIndex())
+                selected_Path = dia.tree_view.currentIndex()
+
                 fileName = self.app.FileS.engine.fileName(file)
                 fromPath = self.app.FileS.engine.filePath(file)
 
                 integrity = FICheck()
                 integrity.addFile(fromPath)
-                # hash1 = self.getAutoHash(fromPath)
 
                 toPath = f"{selected_directory}/{fileName}"
+                toPathIndex = self.app.FileS.engine.index(toPath)
 
-                willMove = QMessageBox.question(
-                    self.app,
-                    "Move item",
-                    f"Переместить {fileName} из {fromPath} в {toPath}",
-                    QMessageBox.Yes|QMessageBox.No
+                willMove = MessageDialog.ask(
+                    "Перемещение",
+                    f"Переместить {fileName} из {fromPath} в {toPath}"
                 )
 
-                if willMove == QMessageBox.StandardButton.Yes:
-                    self.move_file(fromPath, toPath)
+                if willMove:
+                    self.move_file(file=file, pathMove=selected_directory, pathMoveIndex=toPathIndex)
                     integrityResuilt = integrity.compare_with(fromPath, toPath)
                     if integrityResuilt:
                         self.app.Notif.info("Соханность файла", "Файл успешно вставлен без потерь содержимого")
@@ -310,7 +340,9 @@ class FileOperations:
             itemPath = self.app.FileS.engine.filePath(file)
             itemName = self.app.FileS.engine.fileName(file)
 
-            fileName, ok = QInputDialog.getText(self.app, "Ввод", "Новое имя: ", QLineEdit.Normal, text = itemName)
+            fileName, ok = MessageDialog.input("Ввод", "Новое имя: ", default=itemName)
+
+            if not ok: return
 
             fileEntyties = fileName.split('.')
             if len(fileEntyties) >= 2:
