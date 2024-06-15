@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QHeaderVi
     QLabel, QMainWindow, QMenu, QMenuBar,
     QPushButton, QSizePolicy, QStatusBar, QToolBar,
     QTreeView, QVBoxLayout, QWidget)
-import icons_rc
+import rc_icons
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -33,6 +33,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setTabletTracking(False)
+        MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet(u"#centralwidget {\n"
 "	background-color: rgb(255, 255, 255);\n"
 "}\n"
@@ -55,7 +56,11 @@ class Ui_MainWindow(object):
 "	padding: 5px;\n"
 "	border-radius: 5px;\n"
 "}\n"
-"            \n"
+"\n"
+"QMainWindow {\n"
+"	background-color: rgb(255, 255, 255);\n"
+"}\n"
+"           \n"
 "QPushButton:hover {\n"
 "	background-color: #87CEFA; /* Light blue on hover */\n"
 "}\n"

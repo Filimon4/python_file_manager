@@ -79,6 +79,7 @@ class FileView(QWidget):
         self.moves["index"] = len(self.moves["steps"]) - 1
 
     def parent(self):
+        self.app.updateDir_Signal.emit()
         dirs = self.app.currentDir.split('/')
 
         if not (QDir(self.app.currentDir).cdUp()):
@@ -93,42 +94,42 @@ class FileView(QWidget):
             prevHop = 0
         lastStep = '/'.join([i for i in self.moves['steps'][0:self.moves['index']]])
         self.moves["index"] = prevHop
-        print(lastStep)
 
         self.app.renderVirtualRoot_Signal.emit(lastStep)
-
-        
 
     def redo(self):
         nextHop = self.moves["index"]+1
         if nextHop >= len(self.moves["steps"])-1:
             nextHop = len(self.moves["steps"])-1
         self.moves["index"] = nextHop
+        steps = ''
+        for k,v in enumerate(self.moves['steps']):
+            if k < self.moves['index']:
+                steps += v + '/'
         nextStep = '/'.join([i for i in self.moves['steps'][0:self.moves['index']+1]])
-        print("NexStep: ", nextStep)
 
         self.app.renderVirtualRoot_Signal.emit(nextStep)
 
 
     def update_move_btn(self):
-        self.levelUp_btn.setEnabled(False)
-        self.undo_btn.setEnabled(False)
-        self.redo_btn.setEnabled(False)
 
         lenSteps = len(self.moves['steps'])
-        if lenSteps == 0:
-            pass
-        elif lenSteps == 1:
-            self.undo_btn.setEnabled(True)
-            self.levelUp_btn.setEnabled(True)
-        elif lenSteps > 0 and self.moves['index']+1 < lenSteps:
-            self.levelUp_btn.setEnabled(True)
-            self.undo_btn.setEnabled(True)
-            self.redo_btn.setEnabled(True)
-        elif lenSteps == self.moves['index']+1:
-            self.undo_btn.setEnabled(True)
-            self.levelUp_btn.setEnabled(True)
 
+        rootEntyties = [i for i in self.app.FileS.engine.rootPath().split('/') if i]
+
+        if len(rootEntyties) == 0 or lenSteps == 0:
+            self.undo_btn.setEnabled(False)
+            self.levelUp_btn.setEnabled(False)
+        else:
+            self.undo_btn.setEnabled(True)
+            self.levelUp_btn.setEnabled(True)
+        
+        if lenSteps == self.moves['index']+1:
+            self.redo_btn.setEnabled(False)
+        else:
+            self.redo_btn.setEnabled(True)
+
+        
     def resizeEvent(self, event):
         self.tree.resize(QSize(self.ui.treeView.width(), self.ui.treeView.height()))
 

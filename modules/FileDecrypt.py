@@ -35,8 +35,6 @@ class Decrypt(CipherAlgo):
             readBinary = self.app.FileO.readBinaryFile(file_to_decipher)
 
             deciphertext = super().feistel_decipher(readBinary, keys=[k1,k2,k3,k4])
-            print(deciphertext)
-            print(base64.b64decode(deciphertext))
             if len(fileEntyties) >= 2:
                 self.app.FileO.newFileBinarySilent(f"{'.'.join(fileEntyties[0:-1])}.{fileEntyties[-1]}", base64.b64decode(deciphertext))
             else:

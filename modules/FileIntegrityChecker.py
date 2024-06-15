@@ -51,11 +51,7 @@ class FolderIntegrityChecker(FileIntegrityChecker):
         self.folder_dict = {}
 
     def addFolder(self, folder_path):
-        print(folder_path)
         for root, dirs, files in os.walk(folder_path):
-            print("Roots: ", root)
-            print("Dirs: ", dirs)
-            print("Files: ", files)
             self.folder_dict[root] = {}
             for f in files:
                 fPath = os.path.join(root, f)

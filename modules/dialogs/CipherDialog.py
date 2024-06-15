@@ -95,7 +95,7 @@ class CipherDialog(QDialog):
             cipher_params_layout.addLayout(cipher_keys_layout)
         cipher_params_layout.addWidget(self.rewriteKeys)
         layout.addLayout(cipher_params_layout)
-        ok_button = QPushButton("OK")
+        ok_button = QPushButton("Ок")
         ok_button.clicked.connect(self.ok_clicked)
         layout.addWidget(ok_button)
         self.setLayout(layout)
@@ -134,8 +134,6 @@ class CipherDialog(QDialog):
 
 
     def browse_file_to_cipher(self):
-        # file_dialog = QFileDialog()
-        # file_dialog.setFileMode(QFileDialog.ExistingFile)
         file_dialog = FileSelectorDialog(self.app.currentDir)
         result = file_dialog.exec_()
         if result == QDialog.Accepted:
@@ -152,7 +150,6 @@ class CipherDialog(QDialog):
                         self.file_to_cipher_edit.setText(f"{self.parentOfSelected}/")
                 else:
                     self.file_to_cipher_edit.setText(selected_files[0])
-
 
     def is_file_path_available(self, file_path):
         return not os.path.exists(file_path)
@@ -172,6 +169,19 @@ class CipherDialog(QDialog):
         if not self.is_file_path_available(self.output_file_path):
             print("Output file path already exists. Choose a different one.")
             return
+
+        if self.rewriteKeys.isChecked():
+            keys = {
+                "0": self.b1_box.text(),
+                "1": self.b2_box.text(),
+                "2": self.b3_box.text(),
+                "3": self.b4_box.text()
+            }
+            print(keys)
+            with open('./keys.json', 'w') as jf:
+                json.dump(keys, jf, indent=4)
+
+
         self.accept()
 
 class EncryptCipherDialog(CipherDialog):

@@ -38,7 +38,6 @@ class FileOperations:
         
         if ok and folderName:
             counter = self.getNumberOfSameName(self.app.currentDir, folderName, folder=True)
-            print(counter)
             if counter > 0:
                 QDir(self.app.currentDir).mkdir(f"{folderName} ({counter})")
             else:
@@ -47,6 +46,14 @@ class FileOperations:
     def newFile(self):
         self.app.updateDir_Signal.emit()
         fileName, ok = QInputDialog.getText(self.app, "Ввод", "Название файла: ", QLineEdit.Normal, text="Новый файл.txt")
+        
+        clearName = ''
+        invalidChars = '<>:"/\\|?*'
+        for i in fileName:
+            if not i in invalidChars:
+                clearName += i
+        fileName = clearName
+        
         if ok:
             file = f"{self.app.currentDir}/{fileName}"
             fileEntities = fileName.split('.')
@@ -117,14 +124,13 @@ class FileOperations:
                     if fileEntyties[-1] == fileExt:
                         fileSameExt.append('.'.join(fileEntyties[0:-1]))
             files = fileSameExt
-        print('Check objects: ', files)
 
-        name_pattern_copy = re.compile(f"{fileName}" + r' (\(\d+\))?$')
-        name_pattern = re.compile(f'{fileName}$')
+        name_pattern_copy = re.compile(r"{fileName}" + r' (\(\d+\))?$')
+        name_pattern = re.compile(r'{fileName}$')
 
         count = 0
         for item in files:
-            if name_pattern.match(item) or name_pattern_copy.match(item):
+            if name_pattern.match(item) or name_pattern_copy.match(item) or fileName == item:
                 count += 1
                 
         if count >= 1:
@@ -138,7 +144,7 @@ class FileOperations:
             
             while pathlib.Path(getObjPath(count)).exists():
                 try:
-                    if count > 8:
+                    if count > 8000:
                         count = 'denied'
                         break
                     count += 1
@@ -164,7 +170,7 @@ class FileOperations:
             toPath = f"{self.app.currentDir}/{fromName}"
             checkIntegrity = None
 
-            if self.app.FileS.engine.fileInfo(file).isDir():    
+            if self.app.FileS.engine.fileInfo(file).isDir():
 
                 filePath = self.app.FileS.engine.filePath(file)
                 fileName = self.app.FileS.engine.fileName(file)
@@ -179,6 +185,7 @@ class FileOperations:
                         print('## ## ## SAME FILE ERROR ## ## ##')
 
                 counter = self.getNumberOfSameName(self.app.currentDir, fileName, folder=True)
+                print("Counter ", counter)
                 if counter > 0:
                     copyTree(filePath, f"{self.app.currentDir}/{fileName} ({counter})")
                 else:
@@ -200,8 +207,10 @@ class FileOperations:
                 fileEntities = fileName.split('.')
                 if len(fileEntities) >= 2:
                     counter = self.getNumberOfSameName(self.app.currentDir, '.'.join(fileEntities[0:-1]), fileEntities[-1])
+                    print("Counter ", counter)
                 else:
                     counter = self.getNumberOfSameName(self.app.currentDIr, fileEntities[0])
+                    print("Counter ", counter)
                 if counter > 0:
                     if len(fileEntities) >= 2:
                         toPath = f"{self.app.currentDir}/{'.'.join(fileEntities[0:-1])} ({counter}).{fileEntities[-1]}"

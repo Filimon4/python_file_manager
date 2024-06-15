@@ -1,6 +1,7 @@
 import os
 import time
 
+import rc_icons
 from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox
@@ -8,7 +9,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import (
     QSize, Signal, Slot, QTimer
 )
-from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent, QIcon
+from PySide6.QtGui import QKeySequence, QShortcut, QMouseEvent, QIcon, QPixmap
 from ui_mainwindow import Ui_MainWindow
 
 # Main logic modules
@@ -26,7 +27,7 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
 
-        app_icon = QIcon('app_icon.png')
+        app_icon = QIcon(QPixmap(':/app_icon.png'))
         self.setWindowIcon(app_icon)
 
         self.currentDir = ""
@@ -92,7 +93,6 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
         self.FileV.tree.clearSelection()
         self.FileV.update_steps(self.currentDir)
         self.FileV.update_move_btn()
-        # print(self.FileS.engine.rootPath())
 
     @Slot(str)
     def renderVirtualRoot(self, dir):
@@ -115,7 +115,6 @@ class FileExplorerApp(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def updateDir(self):
-        print(self.FileS.engine.rootPath())
         self.currentDir = self.FileS.engine.rootPath()
         self.FileS.engine.setRootPath(self.currentDir)
         self.FileV.rootIndex = self.FileS.engine.index(self.currentDir)

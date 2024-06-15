@@ -35,5 +35,4 @@ class Encrypt(CipherAlgo):
             plain_text = base64.b64encode(readBinary)
 
             ciphertext = super().feistel_cipher(plain_text, [k1,k2,k3,k4])
-            print(ciphertext)
             self.app.FileO.newFileBinarySilent(f"{fileName.split('.')[0]}.b64", ciphertext)

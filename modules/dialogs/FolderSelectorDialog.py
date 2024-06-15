@@ -2,28 +2,6 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QTreeView,QFileSy
 from PySide6.QtCore import QDir, QFileInfo, QSortFilterProxyModel, Qt
 from PySide6.QtGui import QIcon
 
-class FilterProxy(QSortFilterProxyModel):
-    def __init__(self, disables=False, parent=None):
-        super().__init__(parent)
-        self._disables = bool(disables)
-
-    def filterAcceptsRow(self, row, parent):
-        index = self.sourceModel().index(row, 0, parent)
-        if not self._disables:
-            return self.matchIndex(index)
-        return index.isValid()
-
-    def matchIndex(self, index):
-        return (self.sourceModel().isDir(index) or
-                super().filterAcceptsRow(index.row(), index.parent()))
-
-    def flags(self, index):
-        flags = super().flags(index)
-        if (self._disables and
-            not self.matchIndex(self.mapToSource(index))):
-            flags &= ~Qt.ItemIsEnabled
-        return flags
-
 class FileSelectorDialog(QDialog):
     def __init__(self, currentDir):
         super(FileSelectorDialog, self).__init__()
@@ -46,10 +24,6 @@ class FileSelectorDialog(QDialog):
 
         self.model = QFileSystemModel()
         self.model.setRootPath(QDir.rootPath())
-        # self.model.setFilter()
-        # self.proxy = QSortFilterProxyModel(self)
-        # self.proxy.setFilterRegularExpression(r'*')
-        # self.proxy.setSourceModel(self.model)
         self.model.setNameFilters(['*.b64'])
         self.tree_view.setModel(self.model)
 

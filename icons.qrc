@@ -13,5 +13,8 @@
         <file>imgs_file_manager/scissors.png</file>
         <file>imgs_file_manager/trash.png</file>
         <file>imgs_file_manager/undo-alt.png</file>
+        <file>imgs_file_manager/cipher.png</file>
+        <file>imgs_file_manager/decipher.png</file>
+        <file>app_icon.png</file>
     </qresource>
 </RCC>
