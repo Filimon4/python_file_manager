@@ -40,7 +40,6 @@ class TextEditorDialog(QDialog):
     def loadFile(self):
 
         fileSize = os.path.getsize(self.filePath)
-        print(fileSize)
 
         p = QProgressDialog("Чтение файла", "Закрыть", 0, fileSize, self)
         p.setWindowModality(Qt.WindowModal)

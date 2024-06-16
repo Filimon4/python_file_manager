@@ -17,4 +17,4 @@ class ProgressBar(QProgressDialog):
         super().setValue(nextStep)
 
     def cancel(self):
-        print('Отмена операции')
+        pass

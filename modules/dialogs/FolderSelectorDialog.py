@@ -94,7 +94,6 @@ class FolderSelectorDialog(QDialog):
             self.setEnabled_ok_button(QFileInfo(selected_directory).isDir())
 
             self.folder_name_line_edit.setText(selected_directory)
-            print(selected_directory, self.currentDir)
         else:
             self.setEnabled_ok_button(False)
             self.folder_name_line_edit.clear()

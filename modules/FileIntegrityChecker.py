@@ -17,7 +17,6 @@ class FileIntegrityChecker:
                 for chunk in iter(lambda: file.read(4096), b''):
                     hash_object.update(chunk)
         except PermissionError:
-            print('PERSMISSION ERROR')
             return 'denied'
         return hash_object.hexdigest()  
 
@@ -38,10 +37,8 @@ class FileIntegrityChecker:
         stored_hash = self.hash_dict.get(source)
 
         if stored_hash and current_hash == stored_hash:
-            print(f"Integrity check passed for file: {index}")
             return True
         else:
-            print(f"Integrity check failed for file: {index}")
             return False
         
 class FolderIntegrityChecker(FileIntegrityChecker):

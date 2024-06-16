@@ -45,17 +45,17 @@ class MessageDialog:
         button = QMessageBox.question(self.parent, "Question dialog", "The longer message")
 
         if button == QMessageBox.StandardButton.Yes:
-            print("Yes")
+            pass
         else:
-            print("NO")
+            pass
 
     def info(self, title, message):
         button = QMessageBox.information(self.parent, title, message)
 
         if button == QMessageBox.StandardButton.Ok:
-            print("Ok")
+            pass
         else:
-            print("No")
+            pass
 
     def critical(self):
         button = QMessageBox.critical(
@@ -67,8 +67,8 @@ class MessageDialog:
         )
 
         if button == QMessageBox.StandardButton.Discard:
-            print("Discard!")
+            pass
         elif button == QMessageBox.StandardButton.NoToAll:
-            print("No to all!")
+            pass
         else:
-            print("Ignore!")
+            pass

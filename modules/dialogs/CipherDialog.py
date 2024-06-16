@@ -162,12 +162,16 @@ class CipherDialog(QDialog):
         self.k3 = self.b3_box.text()
         self.k4 = self.b4_box.text()
 
+        if not self.k1 or not self.k2 or not self.k3 or not self.k4:
+            self.app.Notif.info('Информация', 'Проверте ключи')
+            return
+
         if not self.file_to_cipher or not self.output_file_path:
-            print("Please provide both input and output file paths.")
+            self.app.Notif.info('Информация', "Проверьте пути файлов")
             return
 
         if not self.is_file_path_available(self.output_file_path):
-            print("Output file path already exists. Choose a different one.")
+            self.app.Notif.info('Информация', "Проверьте пути файлов")
             return
 
         if self.rewriteKeys.isChecked():
@@ -177,7 +181,6 @@ class CipherDialog(QDialog):
                 "2": self.b3_box.text(),
                 "3": self.b4_box.text()
             }
-            print(keys)
             with open('./keys.json', 'w') as jf:
                 json.dump(keys, jf, indent=4)
 
